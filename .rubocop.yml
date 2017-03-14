@@ -3,8 +3,9 @@ inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.2
   Exclude:
-    - bin/**
+    - 'bin/**'
     - 'config/deploy/*.rb'
+    - 'vendor/**/*'
 
 # because we won't have many gems so a more "semantic" ordering will work
 Bundler/OrderedGems:
