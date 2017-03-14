@@ -1,0 +1,5 @@
+coverage
+log
+doc/
+#tmp/*.*
+.pry_history
