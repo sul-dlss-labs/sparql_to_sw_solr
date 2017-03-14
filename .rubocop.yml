@@ -1,0 +1,33 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  TargetRubyVersion: 2.2
+  Exclude:
+    - 'bin/**'
+    - 'config/deploy/*.rb'
+    - 'vendor/**/*'
+
+# because we won't have many gems so a more "semantic" ordering will work
+Bundler/OrderedGems:
+  Exclude:
+    - 'Gemfile'
+
+# because this isn't 1970
+Metrics/LineLength:
+  Max: 120
+
+# because it can make the code more skimmable/readable
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+# because it can make the code more skimmable/readable
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+# because it can make the code more skimmable/readable
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+# because it's silly to care
+Style/StringLiterals:
+  Enabled: false
