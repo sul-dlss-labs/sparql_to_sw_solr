@@ -1,5 +1,5 @@
-set :application, 'sparq-to-sw-solr'
-set :repo_url, 'https://github.com/sul-dlss/sparql-to-sw-solr.git'
+set :application, 'sparql_to_sw_solr'
+set :repo_url, 'https://github.com/sul-dlss/sparql_to_sw_solr.git'
 set :deploy_host, "sul-ld4p-blazegraph-#{fetch(:stage)}.stanford.edu"
 set :user, 'ld4p'
 

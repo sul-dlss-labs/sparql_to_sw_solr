@@ -1,10 +1,10 @@
-[![Build Status](https://travis-ci.org/sul-dlss/sparql-to-sw-solr.svg?branch=master)](https://travis-ci.org/sul-dlss/sparql-to-sw-solr)
-[![Coverage Status](https://coveralls.io/repos/github/sul-dlss/sparql-to-sw-solr/badge.svg)](https://coveralls.io/github/sul-dlss/sparql-to-sw-solr)
-[![Dependency Status](https://gemnasium.com/badges/github.com/sul-dlss/sparql-to-sw-solr.svg)](https://gemnasium.com/github.com/sul-dlss/sparql-to-sw-solr)
+[![Build Status](https://travis-ci.org/sul-dlss/sparql_to_sw_solr.svg?branch=master)](https://travis-ci.org/sul-dlss/sparql_to_sw_solr)
+[![Coverage Status](https://coveralls.io/repos/github/sul-dlss/sparql_to_sw_solr/badge.svg)](https://coveralls.io/github/sul-dlss/sparql_to_sw_solr)
+[![Dependency Status](https://gemnasium.com/badges/github.com/sul-dlss/sparql_to_sw_solr.svg)](https://gemnasium.com/github.com/sul-dlss/sparql_to_sw_solr)
 
-[![GitHub version](https://badge.fury.io/gh/sul-dlss%2Fsparql-to-sw-solr.svg)](https://badge.fury.io/gh/sul-dlss%2Fsparql-to-sw-solr)
+[![GitHub version](https://badge.fury.io/gh/sul-dlss%2Fsparql_to_sw_solr.svg)](https://badge.fury.io/gh/sul-dlss%2Fsparql_to_sw_solr)
 
-# sparql-to-sw-solr
+# sparql_to_sw_solr
 
 Perform SPARQL queries against a triplestore to get the data to create Solr documents specific to SearchWorks ... and write the Solr documents to Solr.
 
@@ -37,7 +37,7 @@ Capistrano is used for deployment.
 
     ```
     ssh remote-vm
-    cd sparql-to-sw-solr
+    cd sparql_to_sw_solr
     mkdir shared
     mkdir shared/log
     ```
