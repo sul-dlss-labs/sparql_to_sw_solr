@@ -12,9 +12,17 @@ Bundler/OrderedGems:
   Exclude:
     - 'Gemfile'
 
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**'
+
 # because this isn't 1970
 Metrics/LineLength:
   Max: 120
+
+# because the complexity of this app and its classes shouldn't require this with good naming
+Style/Documentation:
+  Enabled: false
 
 # because it can make the code more skimmable/readable
 Style/EmptyLinesAroundBlockBody:
