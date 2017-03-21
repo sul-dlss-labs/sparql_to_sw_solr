@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake'
-gem 'rsolr'
+gem 'rsolr', '>= 2.0.0.pre1', '< 3' # want Faraday with retries for 503, timeout
 
 group :test do
   gem 'rspec'

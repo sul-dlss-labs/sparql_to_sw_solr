@@ -1,6 +1,8 @@
 require 'coveralls'
 Coveralls.wear!
 
+require 'sparql_to_sw_solr'
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
 
