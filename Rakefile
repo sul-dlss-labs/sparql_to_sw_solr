@@ -39,11 +39,12 @@ task :create_1234567890_solr_doc do
     return
   end
   ss = SparqlToSwSolr::SolrService.new
-  ss.add_one_doc(doc_hash)
+  ss.add_one_doc(doc_hash) # includes commitWithin argument
 end
 
 desc 'Temporary: delete solr doc 1234567890'
 task :delete_1234567890_solr_doc do
   ss = SparqlToSwSolr::SolrService.new
   ss.delete_by_id('1234567890')
+  ss.commit # because no commit is sent separately
 end

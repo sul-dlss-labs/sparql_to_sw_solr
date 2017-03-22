@@ -30,6 +30,13 @@ RSpec.describe SparqlToSwSolr::SolrService do
     end
   end
 
+  context '#commit' do
+    it 'is delegated to conn' do
+      expect(ss.send(:conn)).to receive(:commit)
+      ss.commit
+    end
+  end
+
   context '#delete_by_id' do
     it 'is delegated to conn' do
       expect(ss.send(:conn)).to receive(:delete_by_id).with('666')
