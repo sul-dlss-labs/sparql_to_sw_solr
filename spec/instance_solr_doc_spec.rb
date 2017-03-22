@@ -9,27 +9,37 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
     end
   end
 
-  context '#assemble_doc' do
+  context '#solr_doc_hash' do
     let(:doc_hash) do
-      isd.assemble_doc
       isd.solr_doc_hash
     end
-    it 'assigns a hash value to @solr_doc_hash' do
+    it 'is a Hash value' do
       expect(doc_hash).to be_a Hash
       expect(doc_hash.size).to be > 0
     end
     it 'assigns an id field with ckey value' do
-      expect(isd).to receive(:instance_uri_to_ckey).and_return('foo')
+      expect(isd).to receive(:instance_uri_to_ckey).and_return('666').twice
       expect(doc_hash[:id].size).to be > 0
-      expect(doc_hash[:id]).to eq 'foo'
+      expect(doc_hash[:id]).to eq '666'
+    end
+    it 'nil if false from #instance_uri_to_ckey' do
+      expect(isd).to receive(:instance_uri_to_ckey).and_return(false)
+      expect(isd.solr_doc_hash).to be_nil
     end
   end
 
   context '#instance_uri_to_ckey' do
-    it 'returns a non-null String' do
+    it 'returns the ckey portion of instance_uri from marc2bibframe2 converter' do
       expect(isd.send(:instance_uri_to_ckey)).to eq '1234567890'
-      skip 'TODO: to be implemented'
+
+      i_uri = 'http://ld4p-test.stanford.edu/666#Instance'
+      isd = SparqlToSwSolr::InstanceSolrDoc.new(i_uri)
+      expect(isd.send(:instance_uri_to_ckey)).to eq '666'
     end
-    # TODO: what if there is no ckey in instance uri?
+    it 'false if non-numeric ckey' do
+      i_uri = 'http://ld4p-test.stanford.edu/foo#Instance'
+      isd = SparqlToSwSolr::InstanceSolrDoc.new(i_uri)
+      expect(isd.send(:instance_uri_to_ckey)).to eq false
+    end
   end
 end

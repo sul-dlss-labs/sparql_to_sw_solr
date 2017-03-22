@@ -10,9 +10,9 @@ module SparqlToSwSolr
     READ_TIMEOUT = 120
     OPEN_TIMEOUT = 120
     NUM_TIMES_RETRY_503 = 1
-    COMMIT_WITHIN = 100
+    COMMIT_WITHIN = 100 # bump this to at least 100000 for multi-document commits
 
-    def_delegators :conn, :delete_by_id
+    def_delegators :conn, :delete_by_id, :commit
 
     def initialize
       @conn_options = {
