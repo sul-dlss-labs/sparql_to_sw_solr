@@ -4,7 +4,7 @@ require 'rake'
 task default: :ci
 
 desc 'run continuous integration suite (tests, coverage, docs)'
-task ci: [:spec, :rubocop]
+task ci: %i(spec rubocop)
 
 begin
   require 'rspec/core/rake_task'
@@ -43,13 +43,19 @@ desc 'Temporary: load sample solr docs'
 task :create_sample_solr_docs do
   ss = SparqlToSwSolr::SolrService.new
   require_relative 'config/sample_instance_uris'
+  # http_proxy is set by puppet because dev box is in private network zone;
+  #  need to unset http_proxy in order to use http (e.g. by the sparql/client gem)
+  old_proxy_val = ENV['http_proxy']
+  ENV['http_proxy'] = ''
   SAMPLE_INSTANCE_URIS.each do |uri|
     isd = SparqlToSwSolr::InstanceSolrDoc.new(uri)
     doc_hash = isd.solr_doc_hash
     if doc_hash.nil?
-      puts 'nil doc_hash:  non-numeric ckey?'
+      puts "nil doc_hash for #{uri}:  non-numeric or non-book ckey?"
       next
     end
+    # puts doc_hash.to_s
     ss.add_one_doc(doc_hash) # includes commitWithin argument
   end
+  ENV['http_proxy'] = old_proxy_val
 end
