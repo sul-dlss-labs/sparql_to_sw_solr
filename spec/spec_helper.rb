@@ -28,7 +28,8 @@ RSpec.configure do |config|
   #   - http://rspec.info/blog/2014/05/notable-changes-in-rspec-3/#zero-monkey-patching-mode
   config.disable_monkey_patching!
 
-  config.warnings = true
+  # set to false because ruby/rdf gems give a lot of warning messages
+  config.warnings = false
 
   # allow more verbose output when running an individual spec file.
   if config.files_to_run.one?
