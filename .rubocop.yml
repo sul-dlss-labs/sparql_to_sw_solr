@@ -19,6 +19,8 @@ Metrics/BlockLength:
 # because this isn't 1970
 Metrics/LineLength:
   Max: 120
+  Exclude:
+    - 'spec/instance_solr_doc_spec.rb'
 
 # because the complexity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
@@ -35,6 +37,11 @@ Style/EmptyLinesAroundClassBody:
 # because it can make the code more skimmable/readable
 Style/EmptyLinesAroundModuleBody:
   Enabled: false
+
+# because some of these methods will need to be long
+Style/MethodLength:
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_solr_doc.rb'
 
 # because it's silly to care
 Style/StringLiterals:
