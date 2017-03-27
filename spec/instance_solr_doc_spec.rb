@@ -28,18 +28,16 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
     end
   end
 
-  context '#instance_uri_to_ckey' do
+  context '.instance_uri_to_ckey' do
     it 'returns the ckey portion of instance_uri from marc2bibframe2 converter' do
-      expect(isd.send(:instance_uri_to_ckey)).to eq '1234567890'
+      expect(SparqlToSwSolr::InstanceSolrDoc.instance_uri_to_ckey(instance_uri)).to eq '1234567890'
 
       i_uri = 'http://ld4p-test.stanford.edu/666#Instance'
-      isd = SparqlToSwSolr::InstanceSolrDoc.new(i_uri)
-      expect(isd.send(:instance_uri_to_ckey)).to eq '666'
+      expect(SparqlToSwSolr::InstanceSolrDoc.instance_uri_to_ckey(i_uri)).to eq '666'
     end
     it 'false if non-numeric ckey' do
       i_uri = 'http://ld4p-test.stanford.edu/foo#Instance'
-      isd = SparqlToSwSolr::InstanceSolrDoc.new(i_uri)
-      expect(isd.send(:instance_uri_to_ckey)).to eq false
+      expect(SparqlToSwSolr::InstanceSolrDoc.instance_uri_to_ckey(i_uri)).to eq false
     end
   end
 end
