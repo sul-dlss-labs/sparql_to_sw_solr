@@ -41,17 +41,17 @@ append :linked_dirs, 'log'
 
 namespace :deploy do
   # needs to be in deploy namespace so deploy_host is defined properly (part of current_path)
-  desc 'Temporary: delete doc 1234567890 from Solr'
-  task :delete_1234567890_from_solr do
+  desc 'Temporary: delete sample docs from Solr'
+  task :delete_sample_solr_docs do
     on roles(:app) do
-      execute "cd #{current_path} && bundle exec rake delete_1234567890_solr_doc"
+      execute "cd #{current_path} && bundle exec rake delete_sample_solr_docs"
     end
   end
 
-  desc 'Temporary: add doc 1234567890 to Solr'
-  task :add_1234567890_to_solr do
+  desc 'Temporary: add sample docs to Solr'
+  task :add_sample_docs_to_solr do
     on roles(:app) do
-      execute "cd #{current_path} && bundle exec rake create_1234567890_solr_doc"
+      execute "cd #{current_path} && bundle exec rake create_sample_solr_docs"
     end
   end
 end
