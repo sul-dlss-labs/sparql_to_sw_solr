@@ -29,22 +29,27 @@ end
 
 require_relative 'lib/sparql_to_sw_solr'
 
-desc 'Temporary: load solr doc 1234567890 for testing'
-task :create_1234567890_solr_doc do
-  instance_uri = 'http://ld4p-test.stanford.edu/1234567890#Instance'
-  isd = SparqlToSwSolr::InstanceSolrDoc.new(instance_uri)
-  doc_hash = isd.solr_doc_hash
-  if doc_hash.nil?
-    puts 'nil doc_hash:  non-numeric ckey?'
-    return
-  end
+desc 'Temporary: delete sample solr docs'
+task :delete_sample_solr_docs do
   ss = SparqlToSwSolr::SolrService.new
-  ss.add_one_doc(doc_hash) # includes commitWithin argument
+  require_relative 'config/sample_instance_uris'
+  SAMPLE_INSTANCE_URIS.each do |uri|
+    ss.delete_by_id(SparqlToSwSolr::InstanceSolrDoc.instance_uri_to_ckey(uri))
+  end
+  ss.commit # because no commit is sent separately
 end
 
-desc 'Temporary: delete solr doc 1234567890'
-task :delete_1234567890_solr_doc do
+desc 'Temporary: load sample solr docs'
+task :create_sample_solr_docs do
   ss = SparqlToSwSolr::SolrService.new
-  ss.delete_by_id('1234567890')
-  ss.commit # because no commit is sent separately
+  require_relative 'config/sample_instance_uris'
+  SAMPLE_INSTANCE_URIS.each do |uri|
+    isd = SparqlToSwSolr::InstanceSolrDoc.new(uri)
+    doc_hash = isd.solr_doc_hash
+    if doc_hash.nil?
+      puts 'nil doc_hash:  non-numeric ckey?'
+      next
+    end
+    ss.add_one_doc(doc_hash) # includes commitWithin argument
+  end
 end
