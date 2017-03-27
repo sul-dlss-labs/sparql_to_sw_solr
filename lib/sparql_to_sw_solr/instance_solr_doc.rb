@@ -22,6 +22,7 @@ module SparqlToSwSolr
     def solr_doc_hash
       @solr_doc_hash ||= begin
         return unless instance_uri_to_ckey
+        return if CKEY_BLACKLIST.include?(@ckey)
         doc = {}
         doc[:id] = instance_uri_to_ckey
         doc

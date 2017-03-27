@@ -26,6 +26,12 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
       expect(isd).to receive(:instance_uri_to_ckey).and_return(false)
       expect(isd.solr_doc_hash).to be_nil
     end
+    it 'nil if ckey is blacklisted' do
+      blacklisted_ckey = '9144273'
+      uri = "http://ld4p-test.stanford.edu/#{blacklisted_ckey}#Instance"
+      isd = SparqlToSwSolr::InstanceSolrDoc.new(uri)
+      expect(isd.solr_doc_hash).to be_nil
+    end
   end
 
   context '.instance_uri_to_ckey' do
