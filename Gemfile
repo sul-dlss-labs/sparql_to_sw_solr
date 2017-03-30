@@ -5,6 +5,7 @@ gem 'rsolr', '>= 2.0.0.pre1', '< 3' # want Faraday with retries for 503, timeout
 
 gem 'linkeddata'
 gem 'rdf-vocab', '>= 2.2.2' # for BF2 vocabulary
+gem 'faraday' # for http connection to sparql backend
 
 group :test do
   gem 'rspec'

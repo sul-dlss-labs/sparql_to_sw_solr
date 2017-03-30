@@ -227,6 +227,7 @@ DEPENDENCIES
   capistrano-bundler
   coveralls
   dlss-capistrano
+  faraday
   linkeddata
   pry-byebug
   rake

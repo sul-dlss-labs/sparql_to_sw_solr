@@ -1,5 +1,5 @@
-require 'sparql/client'
 require 'linkeddata'
+require 'faraday'
 
 module SparqlToSwSolr
   class InstanceSolrDoc
@@ -7,6 +7,10 @@ module SparqlToSwSolr
     # TODO: get these from settings.yml
     SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
     # SPARQL_URL = 'http://sul-ld4p-blazegraph-dev.stanford.edu/blazegraph/namespace/ld4p/sparql'.freeze
+    SPARQL_READ_TIMEOUT = 20
+    SPARQL_CONN_TIMEOUT = 20
+    RETRY_AFTER_LIMIT = 0
+    RETRY_503 = 0
     BASE_URI = 'http://ld4p-test.stanford.edu/'.freeze
     BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
     BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
@@ -70,12 +74,10 @@ module SparqlToSwSolr
       @ckey ||= self.class.instance_uri_to_ckey(@instance_uri)
     end
 
-    def sparql
-      @sparql ||= SPARQL::Client.new(SPARQL_URL)
-    end
-
     def solution_values(property_array, query)
-      sparql_query_obj = sparql.query(query)
+      json = json_sparql_result(query)
+#      sparql_query_obj = sparql.query(query)
+    # jj = json_sparql_result(@PRIMARY_TITLE_QUERY)
       values = ''
       sparql_query_obj.each_solution do |soln|
         property_array.each do |prop|
@@ -83,6 +85,36 @@ module SparqlToSwSolr
         end
       end
       values
+    end
+
+    def json_sparql_result(sparql_query)
+      JSON.parse(sparql_response(sparql_query))
+    end
+
+    def sparql_response(sparql_query)
+      response = sparql_conn.send(:post) do |request|
+        request.body = "query=#{sparql_query}"
+        request.headers['Accept'] = 'application/json'
+      end
+      raise StandardError("SPARQL HTTP failure: #{response.code}") unless response.success?
+      response.body.force_encoding('utf-8')
+    end
+
+    def sparql_conn
+      @connection ||= begin
+        conn_opts = { request: {} }
+        conn_opts[:request][:open_timeout] = SPARQL_CONN_TIMEOUT
+        conn_opts[:request][:timeout] = SPARQL_READ_TIMEOUT
+        conn_opts[:request][:params_encoder] = Faraday::FlatParamsEncoder
+
+        Faraday.new({url: SPARQL_URL}, conn_opts) do |conn|
+          conn.response :raise_error
+          conn.request :retry, max: RETRY_AFTER_LIMIT, interval: 0.05,
+                               interval_randomness: 0.5, backoff_factor: 2,
+                               exceptions: ['Faraday::Error', 'Timeout::Error'] if RETRY_503
+          conn.adapter Faraday.default_adapter
+        end
+      end
     end
   end
 end
