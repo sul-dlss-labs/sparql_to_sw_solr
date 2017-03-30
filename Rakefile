@@ -4,7 +4,7 @@ require 'rake'
 task default: :ci
 
 desc 'run continuous integration suite (tests, coverage, docs)'
-task ci: [:spec, :rubocop]
+task ci: %i(spec rubocop)
 
 begin
   require 'rspec/core/rake_task'
@@ -50,6 +50,7 @@ task :create_sample_solr_docs do
       puts 'nil doc_hash:  non-numeric ckey?'
       next
     end
+    # puts doc_hash.to_s
     ss.add_one_doc(doc_hash) # includes commitWithin argument
   end
 end
