@@ -5,7 +5,8 @@ module SparqlToSwSolr
   class InstanceSolrDoc
 
     # TODO: get these from settings.yml
-    SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
+    SPARQL_URL = 'http://127.0.0.1:8080/blazegraph/namespace/ld4p/sparql'.freeze
+    # SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
     # SPARQL_URL = 'http://sul-ld4p-blazegraph-dev.stanford.edu/blazegraph/namespace/ld4p/sparql'.freeze
     SPARQL_READ_TIMEOUT = 20
     SPARQL_CONN_TIMEOUT = 20
