@@ -16,7 +16,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       before(:each) do
         allow(isd).to receive(:sparql).and_return(sparql_conn)
       end
-      it 'is a String (not an Array - single valued Solr field' do
+      it 'is a mainTitle String (not an Array - single valued Solr field)' do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'foo')
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_245a_search]).to be_a String
@@ -39,7 +39,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       before(:each) do
         allow(isd).to receive(:sparql).and_return(sparql_conn)
       end
-      it 'is a String (not an Array - single valued Solr field' do
+      it 'is a mainTitle String (not an Array - single valued Solr field)' do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'foo')
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_245a_display]).to be_a String
@@ -54,17 +54,17 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           doc_hash = isd.send(:add_doc_title_fields, {})
           expect(doc_hash[:title_245a_display]).to eq 'foo'
         end
-        solutions = RDF::Query::Solutions.new
+      end
+      it 'removes combinations of trailing punct and spaces' do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo : ")
         expect(sparql_conn).to receive(:query).and_return(solutions)
-        allow(isd).to receive(:sparql).and_return(sparql_conn)
-        doc_hash = isd.send(:add_doc_title_fields, {})
         expect(doc_hash[:title_245a_display]).to eq 'foo'
       end
-      xit 'does not remove trailing period' do
+      it 'does not remove trailing period' do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo.")
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_245a_display]).to eq 'foo.'
+        solutions = RDF::Query::Solutions.new
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo Ph.D.")
         expect(sparql_conn).to receive(:query).and_return(solutions)
         allow(isd).to receive(:sparql).and_return(sparql_conn)
@@ -85,6 +85,173 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       it 'nil if there is no mainTitle' do
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_245a_display]).to eq nil
+      end
+    end
+
+    context 'title_245_search' do
+      let(:sparql_conn) { double('sparql client') }
+      before(:each) do
+        allow(isd).to receive(:sparql).and_return(sparql_conn)
+      end
+      it 'is a rdfs:label String (not an Array - single valued Solr field)' do
+        solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: 'foo')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_245_search]).to be_a String
+        expect(doc_hash[:title_245_search]).to eq 'foo'
+      end
+      it 'takes first label if there are multiple values' do
+        solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: 'foo')
+        solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: 'bar')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_245_search]).to eq 'foo'
+      end
+      it 'nil if there is no label' do
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_245_search]).to eq nil
+      end
+    end
+
+    context 'title_display' do
+      let(:sparql_conn) { double('sparql client') }
+      before(:each) do
+        allow(isd).to receive(:sparql).and_return(sparql_conn)
+      end
+
+      it 'is a String concatenation of mainTitle + subtitle' do
+        solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+        solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_display]).to be_a String
+        expect(doc_hash[:title_display]).to eq 'foo : bar'
+      end
+      it 'takes first mainTitle value if there are multiple values for mainTitle' do
+        solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+        solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'goo')
+        solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_display]).to eq 'foo : bar'
+      end
+      it 'removes the mainTitle/subtitle seperator if there is no subtitle' do
+        solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_display]).to eq 'foo'
+      end
+      it 'displays only the subtitle without prefix seperator if there is no mainTitle' do
+        solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_display]).to eq 'bar'
+      end
+      it 'empty if no mainTitle or subtitle value' do
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        expect(doc_hash[:title_display]).to eq ''
+      end
+      it 'removes trailing punctuation' do
+        ['\\', ',', ':', ';', '/'].each do |punct|
+          solutions = RDF::Query::Solutions.new
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: "foo#{punct}")
+          solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar /')
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          allow(isd).to receive(:sparql).and_return(sparql_conn)
+          doc_hash = isd.send(:add_doc_title_fields, {})
+          expect(doc_hash[:title_display]).to eq 'foo : bar'
+        end
+        solutions = RDF::Query::Solutions.new
+        solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo : ")
+        solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar / ')
+        expect(sparql_conn).to receive(:query).and_return(solutions)
+        allow(isd).to receive(:sparql).and_return(sparql_conn)
+        doc_hash = isd.send(:add_doc_title_fields, {})
+        expect(doc_hash[:title_display]).to eq 'foo : bar'
+      end
+    end
+
+    context 'title_full_display' do
+      let(:sparql_conn) { double('sparql client') }
+      before(:each) do
+        allow(isd).to receive(:sparql).and_return(sparql_conn)
+      end
+
+      context 'no responsibility statement' do
+        it 'is the same as title_display String' do
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+          solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          title_display = doc_hash[:title_display]
+          expect(doc_hash[:title_full_display]).to eq(title_display)
+        end
+        it 'takes title_display value if there are multiple values for mainTitle' do
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'goo')
+          solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          title_display = doc_hash[:title_display]
+          expect(doc_hash[:title_full_display]).to eq(title_display)
+        end
+        it 'empty if no title_display value' do
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          expect(doc_hash[:title_full_display]).to eq ''
+        end
+      end
+
+      context 'responsibility statement' do
+        it 'shows just plain title_display value if responsibility statement exists but is empty' do
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+          solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
+          solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: '')
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          title_display = doc_hash[:title_display]
+          expect(doc_hash[:title_full_display]).to eq(title_display)
+        end
+        it 'responsibility statement comes from bf:responsibilityStatement property' do
+          solutions << RDF::Query::Solution.new(p: 'bf:responsibilityStatement', o: 'roo')
+          expect(isd.send(:values_from_solutions, solutions, 'responsibilityStatement')).to eq ['roo']
+        end
+        it 'concatenates resp statement to title_display value with / separator' do
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+          solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: 'roo')
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          expect(doc_hash[:title_full_display]).to include('/')
+        end
+        it 'takes first resp statement if there are multiple values for it' do
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+          solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: 'roo')
+          solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: 'too')
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          expect(doc_hash[:title_full_display]).to eq('foo / roo')
+        end
+        it 'removes trailing punct from responsiblity statement' do
+          ['\\', ',', ':', ';', '/'].each do |punct|
+            solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+            solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: "roo#{punct}")
+            expect(sparql_conn).to receive(:query).and_return(solutions)
+            allow(isd).to receive(:sparql).and_return(sparql_conn)
+            doc_hash = isd.send(:add_doc_title_fields, {})
+            expect(doc_hash[:title_full_display]).to eq 'foo / roo'
+          end
+        end
+        it 'removes comb of trailing punct and spaces from resp statement' do
+          solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
+          solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: "roo : ")
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          allow(isd).to receive(:sparql).and_return(sparql_conn)
+          doc_hash = isd.send(:add_doc_title_fields, {})
+          expect(doc_hash[:title_full_display]).to eq 'foo / roo'
+        end
+      end
+
+      context 'no title_display' do
+        it 'Empty if no title_display or resp statement' do
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          expect(doc_hash[:title_display]).to eq ''
+          expect(doc_hash[:title_full_display]).to eq ''
+        end
+        it 'responsibility statement without prefix separator if no title_display value' do
+          expect(sparql_conn).to receive(:query).and_return(solutions)
+          solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: 'roo')
+          allow(isd).to receive(:sparql).and_return(sparql_conn)
+          expect(doc_hash[:title_display]).to eq ''
+          expect(doc_hash[:title_full_display]).to eq 'roo'
+        end
       end
     end
   end
