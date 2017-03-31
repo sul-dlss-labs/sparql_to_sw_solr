@@ -1,8 +1,16 @@
+require 'linkeddata'
+require_relative 'instance_title_fields'
+
 module SparqlToSwSolr
   class InstanceSolrDoc
+    include InstanceTitleFields
 
-    # TODO: get this from settings.yml
+    # TODO: get these from settings.yml
+    SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
+    # SPARQL_URL = 'http://sul-ld4p-blazegraph-dev.stanford.edu/blazegraph/namespace/ld4p/sparql'.freeze
     BASE_URI = 'http://ld4p-test.stanford.edu/'.freeze
+    BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
+    BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
 
     attr_reader :instance_uri
     attr_reader :solr_doc_hash
@@ -25,6 +33,8 @@ module SparqlToSwSolr
         return if CKEY_BLACKLIST.include?(@ckey)
         doc = {}
         doc[:id] = instance_uri_to_ckey
+        doc[:format_main_ssim] = 'Book'
+        add_doc_title_fields(doc)
         doc
       end
     end
@@ -33,6 +43,19 @@ module SparqlToSwSolr
 
     def instance_uri_to_ckey
       @ckey ||= self.class.instance_uri_to_ckey(@instance_uri)
+    end
+
+    # SPARQL results expected to have "p" for predicate and "o" for object as results
+    def values_from_solutions(solutions, predicate_name)
+      values = []
+      solutions.each_solution do |soln|
+        values << soln.o.to_s if soln.p.end_with?(predicate_name)
+      end
+      values
+    end
+
+    def sparql
+      @sparql ||= SPARQL::Client.new(SPARQL_URL)
     end
   end
 end

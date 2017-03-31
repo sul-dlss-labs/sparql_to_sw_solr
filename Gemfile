@@ -3,6 +3,9 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'rsolr', '>= 2.0.0.pre1', '< 3' # want Faraday with retries for 503, timeout
 
+gem 'linkeddata'
+gem 'rdf-vocab', '>= 2.2.2' # for BF2 vocabulary
+
 group :test do
   gem 'rspec'
   gem 'coveralls', require: false
