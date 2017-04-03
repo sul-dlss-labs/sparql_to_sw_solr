@@ -24,7 +24,7 @@ module SparqlToSwSolr
         #       replace the filter statement with this:
         # filter not exists { ?t a bf:VariantTitle ;
         #   rdfs:subClassOf bf:VariantTitle } .
-        query = "#{BF_NS_DECL}
+        sparql_query "
           SELECT ?p ?o WHERE {
             {
               <#{instance_uri}> bf:title ?t .
@@ -34,8 +34,7 @@ module SparqlToSwSolr
               <#{instance_uri}> bf:responsibilityStatement ?o .
               ?ignore ?p ?o
             }
-          }".freeze
-        sparql.query(query)
+          }"
       end
 
     end
