@@ -12,6 +12,8 @@ module SparqlToSwSolr
     BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
     BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
 
+    DOC_SOURCE = 'bibframe'.freeze
+
     attr_reader :instance_uri
     attr_reader :solr_doc_hash
 
@@ -31,15 +33,22 @@ module SparqlToSwSolr
       @solr_doc_hash ||= begin
         return unless instance_uri_to_ckey
         return if CKEY_BLACKLIST.include?(@ckey)
-        doc = {}
-        doc[:id] = instance_uri_to_ckey
-        doc[:format_main_ssim] = 'Book'
+        doc = init_doc
         add_doc_title_fields(doc)
         doc
       end
     end
 
     private
+
+    def init_doc
+      doc = {}
+      doc[:id] = instance_uri_to_ckey
+      doc[:format_main_ssim] = 'Book'
+      doc[:access_facet] = DOC_SOURCE
+      doc[:collection] = DOC_SOURCE
+      doc
+    end
 
     def instance_uri_to_ckey
       @ckey ||= self.class.instance_uri_to_ckey(@instance_uri)
