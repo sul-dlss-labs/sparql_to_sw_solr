@@ -1,10 +1,12 @@
 require 'linkeddata'
+require_relative 'author_fields'
 require_relative 'instance_title_fields'
 require_relative 'language_field'
 require_relative 'topic_fields'
 
 module SparqlToSwSolr
   class InstanceSolrDoc
+    include AuthorFields
     include InstanceTitleFields
     include LanguageField
     include TopicFields
@@ -40,6 +42,7 @@ module SparqlToSwSolr
         return if CKEY_BLACKLIST.include?(@ckey)
         doc = init_doc
         doc[:language] = language_values
+        add_author_fields(doc)
         add_title_fields(doc)
         add_topic_fields(doc)
         doc
