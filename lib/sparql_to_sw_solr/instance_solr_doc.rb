@@ -1,16 +1,22 @@
 require 'linkeddata'
 require_relative 'instance_title_fields'
+require_relative 'instance_topic_fields'
 
 module SparqlToSwSolr
   class InstanceSolrDoc
     include InstanceTitleFields
+    include InstanceTopicFields
 
     # TODO: get these from settings.yml
     SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
     # SPARQL_URL = 'http://sul-ld4p-blazegraph-dev.stanford.edu/blazegraph/namespace/ld4p/sparql'.freeze
     BASE_URI = 'http://ld4p-test.stanford.edu/'.freeze
+
     BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
     BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
+
+    MADSRDF_NS = 'http://www.loc.gov/mads/rdf/v1#'.freeze
+    MADSRDF_NS_DECL = "PREFIX madsrdf: <#{MADSRDF_NS}>".freeze
 
     DOC_SOURCE = 'bibframe'.freeze
 
@@ -35,6 +41,7 @@ module SparqlToSwSolr
         return if CKEY_BLACKLIST.include?(@ckey)
         doc = init_doc
         add_doc_title_fields(doc)
+        add_doc_topic_fields(doc)
         doc
       end
     end
