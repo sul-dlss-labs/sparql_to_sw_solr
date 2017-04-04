@@ -39,7 +39,9 @@ module SparqlToSwSolr
       end
 
       def chomp_nonwords(topic)
-        topic.to_s.gsub(/\W*$/, '')
+        parsed = topic.to_s.gsub(/\W*$/, '')
+        parsed += ')' if parsed =~ /[(]{1}\w*$/
+        parsed
       end
 
     end

@@ -55,19 +55,20 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
       let(:solr_topics) { doc_hash[:topic_facet] }
       it_behaves_like 'it_indexes_topics'
 
-      it 'strips everything after a "--" and trailing punctuation and whitespace' do
-        bf_topic = 'abc. -- def ;.  '
-        solr_topic = 'abc'
+      def check_parsers(bf_topic, solr_topic)
         solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
         expect(solr_topics).to be_an Array
-        expect(solr_topics).to include solr_topic
+        expect(solr_topics).to eq [solr_topic]
+      end
+
+      it 'strips everything after a "--" and trailing punctuation and whitespace' do
+        check_parsers('abc. -- def ;.  ', 'abc')
       end
       it 'strips only trailing punctuation and whitespace (not all punctuation)' do
-        bf_topic = 'abc, def .  ; , !   '
-        solr_topic = 'abc, def'
-        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
-        expect(solr_topics).to be_an Array
-        expect(solr_topics).to include solr_topic
+        check_parsers('abc, def .  ; , !   ', 'abc, def')
+      end
+      it 'correctly parses a real example' do
+        check_parsers('Conductors (Music)--Italy--Biography', 'Conductors (Music)')
       end
     end
 
