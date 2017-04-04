@@ -6,20 +6,19 @@ module SparqlToSwSolr
 
       def add_doc_topic_fields(doc)
         doc[:topic_search] = topics
-        doc[:topic_facet] = topics
+        doc[:topic_facet] = topics_facet
         doc
       end
 
       def topics
         @topics ||= begin
           results = sparql.query(topic_query)
-          results.map { |t| topic_parse t[:topicLabel] }
+          results.map { |r| chomp_nonwords r[:topicLabel] }
         end
       end
 
-      def topic_parse(topic)
-        t = topic.to_s.split('--').first
-        t.gsub(/\W*$/, '')
+      def topics_facet
+        topics.map { |topic| chomp_nonwords(first_topic(topic)) }
       end
 
       def topic_query
@@ -33,6 +32,14 @@ module SparqlToSwSolr
             ?topic a bf:Topic ;
                    madsrdf:authoritativeLabel ?topicLabel .
           }"
+      end
+
+      def first_topic(topic)
+        topic.to_s.split('--').first
+      end
+
+      def chomp_nonwords(topic)
+        topic.to_s.gsub(/\W*$/, '')
       end
 
     end

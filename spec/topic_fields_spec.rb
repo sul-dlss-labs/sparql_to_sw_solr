@@ -2,6 +2,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
 
   let(:instance_uri) { 'http://ld4p-test.stanford.edu/1234567890#Instance' }
   let(:isd) { SparqlToSwSolr::InstanceSolrDoc.new(instance_uri) }
+  let(:doc_hash) { isd.send(:add_doc_topic_fields, {}) }
 
   context 'SPARQL' do
     let(:sparql_conn) { double('sparql client') }
@@ -13,10 +14,11 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
     end
 
     shared_examples 'it_indexes_topics' do
-      # examples calling this shared_examples must declare `let` for:
-      # :solr_field
-      let(:doc_hash) { isd.send(:add_doc_topic_fields, {}) }
-      let(:solr_topics) { doc_hash[solr_field] }
+      # examples calling this shared_examples must declare:
+      # let(:solr_topics) { doc_hash[:some_topic_field] }
+
+      # These simple topic strings require no parsing; more complex
+      # topic strings are used in specs that require parsing.
       let(:bf_topics) { ['math', 'physics'] }
 
       it 'empty Array when there are no topics' do
@@ -26,39 +28,47 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
       it 'is an Array - multi-valued Solr field - when there is one topic' do
         solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topics.first)
         expect(solr_topics).to be_an Array
-        expect(solr_topics).to include bf_topics.first
+        expect(solr_topics).to eq [bf_topics.first]
       end
       it 'is an Array - multi-valued Solr field - when there are multiple topics' do
-        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topics.first)
-        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topics.last)
+        bf_topics.each do |bf_topic|
+          solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
+        end
         expect(solr_topics).to be_an Array
-        expect(solr_topics).to include bf_topics.first
-        expect(solr_topics).to include bf_topics.last
+        expect(solr_topics).to eq bf_topics
       end
-      it 'strips everything after a "--" and trailing punctuation and whitespace' do
+    end
+
+    context 'topic_search' do
+      let(:solr_topics) { doc_hash[:topic_search] }
+      it_behaves_like 'it_indexes_topics'
+      it 'preserves the entire topic string, including "--", but not trailing punctuation and whitespace' do
         bf_topic = 'abc. -- def ;.  '
-        bf_topic_parsed = 'abc'
+        solr_topic = 'abc. -- def'
         solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
         expect(solr_topics).to be_an Array
-        expect(solr_topics).to include bf_topic_parsed
-      end
-      it 'strips only trailing punctuation and whitespace (not all punctuation)' do
-        bf_topic = 'abc, def .  ; , !   '
-        bf_topic_parsed = 'abc, def'
-        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
-        expect(solr_topics).to be_an Array
-        expect(solr_topics).to include bf_topic_parsed
+        expect(solr_topics).to include solr_topic
       end
     end
 
     context 'topic_facet' do
-      let(:solr_field) { :topic_facet }
+      let(:solr_topics) { doc_hash[:topic_facet] }
       it_behaves_like 'it_indexes_topics'
-    end
 
-    context 'topic_search' do
-      let(:solr_field) { :topic_search }
-      it_behaves_like 'it_indexes_topics'
+      it 'strips everything after a "--" and trailing punctuation and whitespace' do
+        bf_topic = 'abc. -- def ;.  '
+        solr_topic = 'abc'
+        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
+        expect(solr_topics).to be_an Array
+        expect(solr_topics).to include solr_topic
+      end
+      it 'strips only trailing punctuation and whitespace (not all punctuation)' do
+        bf_topic = 'abc, def .  ; , !   '
+        solr_topic = 'abc, def'
+        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
+        expect(solr_topics).to be_an Array
+        expect(solr_topics).to include solr_topic
+      end
     end
 
     context '#topics' do
