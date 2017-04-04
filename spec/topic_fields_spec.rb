@@ -70,6 +70,14 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
       it 'correctly parses a real example' do
         check_parsers('Conductors (Music)--Italy--Biography', 'Conductors (Music)')
       end
+      it 'allows punctuation for latin abbreviation: etc.' do
+        # consider others, but not all of them, e.g.
+        # https://en.wikipedia.org/wiki/List_of_Latin_abbreviations
+        check_parsers(
+          'Comic books, strips, etc.--United States--History and criticism, Combat in art, Combat in literature',
+          'Comic books, strips, etc.'
+        )
+      end
     end
 
     context '#topics' do
