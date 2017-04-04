@@ -1,6 +1,6 @@
 module SparqlToSwSolr
   class InstanceSolrDoc
-    module InstanceTopicFields
+    module TopicFields
 
       private
 

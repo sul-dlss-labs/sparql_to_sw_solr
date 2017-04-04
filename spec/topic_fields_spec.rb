@@ -1,4 +1,4 @@
-RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTopicFields do
+RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
 
   let(:instance_uri) { 'http://ld4p-test.stanford.edu/1234567890#Instance' }
   let(:isd) { SparqlToSwSolr::InstanceSolrDoc.new(instance_uri) }

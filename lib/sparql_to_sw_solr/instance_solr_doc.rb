@@ -1,11 +1,11 @@
 require 'linkeddata'
 require_relative 'instance_title_fields'
-require_relative 'instance_topic_fields'
+require_relative 'topic_fields'
 
 module SparqlToSwSolr
   class InstanceSolrDoc
     include InstanceTitleFields
-    include InstanceTopicFields
+    include TopicFields
 
     # TODO: get these from settings.yml
     SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
