@@ -1,10 +1,12 @@
 require 'linkeddata'
 require_relative 'instance_title_fields'
+require_relative 'language_field'
 require_relative 'topic_fields'
 
 module SparqlToSwSolr
   class InstanceSolrDoc
     include InstanceTitleFields
+    include LanguageField
     include TopicFields
 
     # TODO: get these from settings.yml
@@ -40,6 +42,7 @@ module SparqlToSwSolr
         return unless instance_uri_to_ckey
         return if CKEY_BLACKLIST.include?(@ckey)
         doc = init_doc
+        doc[:language] = language_values
         add_doc_title_fields(doc)
         add_doc_topic_fields(doc)
         doc
@@ -65,6 +68,8 @@ module SparqlToSwSolr
     def values_from_solutions(solutions, predicate_name)
       values = []
       solutions.each_solution do |soln|
+        # need next line for specs
+        next unless soln.bindings.keys.include?(:o) && soln.bindings.keys.include?(:p)
         values << soln.o.to_s if soln.p.end_with?(predicate_name)
       end
       values

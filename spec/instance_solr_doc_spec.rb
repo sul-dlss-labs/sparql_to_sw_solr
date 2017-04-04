@@ -65,14 +65,21 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
       expect(doc_hash).to be_a Hash
       expect(doc_hash.size).to be > 0
     end
-    it 'includes other fields' do
-      allow(isd).to receive(:instance_uri_to_ckey).and_return('666')
-      solutions = RDF::Query::Solutions.new
-      sparql_conn = double('sparql client', query: solutions)
-      allow(isd).to receive(:sparql).and_return(sparql_conn)
-      expect(isd).to receive(:add_doc_title_fields).and_return({})
-      expect(isd).to receive(:add_doc_topic_fields).and_return({})
-      expect(doc_hash).to be_a Hash
+
+    context 'includes field(s) for' do
+      it 'titles' do
+        expect(isd).to receive(:add_doc_title_fields)
+        isd.solr_doc_hash
+      end
+      it 'topics' do
+        expect(isd).to receive(:add_doc_topic_fields)
+        isd.solr_doc_hash
+      end
+      it 'language' do
+        lang_value = ['Italian', 'Chinese', 'Spanish']
+        expect(isd).to receive(:language_values).and_return(lang_value)
+        expect(doc_hash).to include(language: lang_value)
+      end
     end
   end
 
