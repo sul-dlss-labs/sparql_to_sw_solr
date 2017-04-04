@@ -39,7 +39,7 @@ Metrics/MethodLength:
 # because some of these methods will need to be a bit complex to deal with punctuation
 Metrics/PerceivedComplexity:
   Max: 10
-
+  
 # because the complexity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
   Enabled: false
