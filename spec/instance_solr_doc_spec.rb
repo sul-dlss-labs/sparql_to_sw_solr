@@ -65,13 +65,14 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
       expect(doc_hash).to be_a Hash
       expect(doc_hash.size).to be > 0
     end
-    it 'includes title fields' do
+    it 'includes other fields' do
       allow(isd).to receive(:instance_uri_to_ckey).and_return('666')
       solutions = RDF::Query::Solutions.new
-      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'foo')
       sparql_conn = double('sparql client', query: solutions)
       allow(isd).to receive(:sparql).and_return(sparql_conn)
-      expect(doc_hash[:title_245a_search]).to eq 'foo'
+      expect(isd).to receive(:add_doc_title_fields).and_return({})
+      expect(isd).to receive(:add_doc_topic_fields).and_return({})
+      expect(doc_hash).to be_a Hash
     end
   end
 
