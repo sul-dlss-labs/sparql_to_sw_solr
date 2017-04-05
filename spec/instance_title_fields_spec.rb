@@ -118,7 +118,6 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       before(:each) do
         allow(isd).to receive(:sparql).and_return(sparql_conn)
       end
-
       it 'is a String concatenation of mainTitle + subtitle' do
         solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
         solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
@@ -133,17 +132,17 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_display]).to eq 'foo : bar'
       end
-      it 'removes the mainTitle/subtitle seperator if there is no subtitle' do
+      it 'does not include separator if there is no subtitle' do
         solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_display]).to eq 'foo'
       end
-      it 'displays only the subtitle without prefix seperator if there is no mainTitle' do
+      it 'includes only the subtitle without separator if there is no mainTitle' do
         solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar')
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_display]).to eq 'bar'
       end
-      it 'empty if no mainTitle or subtitle value' do
+      it 'empty String if no mainTitle or subtitle value' do
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_display]).to eq ''
       end
@@ -157,7 +156,8 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           doc_hash = isd.send(:add_title_fields, {})
           expect(doc_hash[:title_display]).to eq 'foo : bar'
         end
-        solutions = RDF::Query::Solutions.new
+      end
+      it 'removes combinations of trailing punct and spaces' do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo : ")
         solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar / ')
         expect(sparql_conn).to receive(:query).and_return(solutions)
@@ -172,7 +172,6 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       before(:each) do
         allow(isd).to receive(:sparql).and_return(sparql_conn)
       end
-
       context 'no responsibility statement' do
         it 'is the same as title_display String' do
           solutions << RDF::Query::Solution.new(p: 'mainTitle', o: 'foo')
