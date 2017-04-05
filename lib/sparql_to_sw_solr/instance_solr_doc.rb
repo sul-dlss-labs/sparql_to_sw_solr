@@ -43,8 +43,8 @@ module SparqlToSwSolr
         return if CKEY_BLACKLIST.include?(@ckey)
         doc = init_doc
         doc[:language] = language_values
-        add_doc_title_fields(doc)
-        add_doc_topic_fields(doc)
+        add_title_fields(doc)
+        add_topic_fields(doc)
         doc
       end
     end

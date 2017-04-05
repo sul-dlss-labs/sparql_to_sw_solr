@@ -2,7 +2,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
 
   let(:instance_uri) { 'http://ld4p-test.stanford.edu/1234567890#Instance' }
   let(:isd) { SparqlToSwSolr::InstanceSolrDoc.new(instance_uri) }
-  let(:doc_hash) { isd.send(:add_doc_topic_fields, {}) }
+  let(:doc_hash) { isd.send(:add_topic_fields, {}) }
 
   context 'SPARQL' do
     let(:sparql_conn) { double('sparql client') }

@@ -4,7 +4,7 @@ module SparqlToSwSolr
 
       private
 
-      def add_doc_topic_fields(doc)
+      def add_topic_fields(doc)
         doc[:topic_search] = topics
         doc[:topic_facet] = topics_facet
         doc

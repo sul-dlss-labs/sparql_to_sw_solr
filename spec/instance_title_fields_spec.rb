@@ -7,8 +7,8 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
     expect(isd.instance_uri).to eq instance_uri
   end
 
-  context 'add_doc_title_fields' do
-    let(:doc_hash) { isd.send(:add_doc_title_fields, {}) }
+  context 'add_title_fields' do
+    let(:doc_hash) { isd.send(:add_title_fields, {}) }
     let(:solutions) { RDF::Query::Solutions.new }
 
     context 'title_245a_search' do
@@ -51,13 +51,15 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo#{punct}")
           expect(sparql_conn).to receive(:query).and_return(solutions)
           allow(isd).to receive(:sparql).and_return(sparql_conn)
-          doc_hash = isd.send(:add_doc_title_fields, {})
+          doc_hash = isd.send(:add_title_fields, {})
           expect(doc_hash[:title_245a_display]).to eq 'foo'
         end
       end
       it 'removes combinations of trailing punct and spaces' do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo : ")
         expect(sparql_conn).to receive(:query).and_return(solutions)
+        allow(isd).to receive(:sparql).and_return(sparql_conn)
+        doc_hash = isd.send(:add_title_fields, {})
         expect(doc_hash[:title_245a_display]).to eq 'foo'
       end
       it 'does not remove trailing period' do
@@ -68,7 +70,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
         solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: "foo Ph.D.")
         expect(sparql_conn).to receive(:query).and_return(solutions)
         allow(isd).to receive(:sparql).and_return(sparql_conn)
-        doc_hash = isd.send(:add_doc_title_fields, {})
+        doc_hash = isd.send(:add_title_fields, {})
         expect(doc_hash[:title_245a_display]).to eq 'foo Ph.D.'
       end
       it 'removes leading and trailing whitespace' do
@@ -152,7 +154,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar /')
           expect(sparql_conn).to receive(:query).and_return(solutions)
           allow(isd).to receive(:sparql).and_return(sparql_conn)
-          doc_hash = isd.send(:add_doc_title_fields, {})
+          doc_hash = isd.send(:add_title_fields, {})
           expect(doc_hash[:title_display]).to eq 'foo : bar'
         end
         solutions = RDF::Query::Solutions.new
@@ -160,7 +162,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
         solutions << RDF::Query::Solution.new(p: 'subtitle', o: 'bar / ')
         expect(sparql_conn).to receive(:query).and_return(solutions)
         allow(isd).to receive(:sparql).and_return(sparql_conn)
-        doc_hash = isd.send(:add_doc_title_fields, {})
+        doc_hash = isd.send(:add_title_fields, {})
         expect(doc_hash[:title_display]).to eq 'foo : bar'
       end
     end
@@ -225,7 +227,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
             solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: "roo#{punct}")
             expect(sparql_conn).to receive(:query).and_return(solutions)
             allow(isd).to receive(:sparql).and_return(sparql_conn)
-            doc_hash = isd.send(:add_doc_title_fields, {})
+            doc_hash = isd.send(:add_title_fields, {})
             expect(doc_hash[:title_full_display]).to eq 'foo / roo'
           end
         end
@@ -234,7 +236,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: "roo : ")
           expect(sparql_conn).to receive(:query).and_return(solutions)
           allow(isd).to receive(:sparql).and_return(sparql_conn)
-          doc_hash = isd.send(:add_doc_title_fields, {})
+          doc_hash = isd.send(:add_title_fields, {})
           expect(doc_hash[:title_full_display]).to eq 'foo / roo'
         end
       end
