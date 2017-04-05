@@ -17,8 +17,6 @@ module SparqlToSwSolr
     BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
     BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
 
-    MADSRDF_NS = 'http://www.loc.gov/mads/rdf/v1#'.freeze
-    MADSRDF_NS_DECL = "PREFIX madsrdf: <#{MADSRDF_NS}>".freeze
 
     DOC_SOURCE = 'bibframe'.freeze
 
