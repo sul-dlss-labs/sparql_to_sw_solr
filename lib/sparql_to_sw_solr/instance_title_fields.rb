@@ -14,11 +14,11 @@ module SparqlToSwSolr
         primary_subtitle = values_from_solutions(primary_solutions, 'subtitle').first
         # TODO: what should separator be? what if main title ends with '=' ?
         doc[:title_display] = "#{primary_main_title.strip.gsub(/[\\,:;\/ ]+$/, '') if primary_main_title}" \
-                              "#{primary_subtitle.present? && primary_main_title.present? ? ' : ' : nil}" \
+                              "#{present?(primary_subtitle) && present?(primary_main_title) ? ' : ' : nil}" \
                               "#{primary_subtitle.strip.gsub(/[\\,:;\/ ]+$/, '') if primary_subtitle}"
         resp_statement = values_from_solutions(primary_solutions, 'responsibilityStatement').first
         doc[:title_full_display] = "#{doc[:title_display]}" \
-                                   "#{doc[:title_display].present? && resp_statement.present? ? ' / ' : nil}" \
+                                   "#{present?(doc[:title_display]) && present?(resp_statement) ? ' / ' : nil}" \
                                    "#{resp_statement.gsub(/[\\,:;\/ ]+$/, '') if resp_statement}"
         doc
       end
@@ -42,6 +42,9 @@ module SparqlToSwSolr
         sparql.query(query)
       end
 
+      def present?(string)
+        string && !string.empty?
+      end
     end
   end
 end
