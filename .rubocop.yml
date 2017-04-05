@@ -14,11 +14,16 @@ Bundler/OrderedGems:
 
 # because we have code that is clearer this way
 Metrics/AbcSize:
-  Max: 16
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
 Metrics/BlockLength:
   Exclude:
     - 'spec/**'
+
+# because some of these methods will need to be a bit complex to deal with punctuation
+Metrics/CyclomaticComplexity:
+  Max: 10
 
 # because this isn't 1970
 Metrics/LineLength:
@@ -31,6 +36,10 @@ Metrics/MethodLength:
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
+# because some of these methods will need to be a bit complex to deal with punctuation
+Metrics/PerceivedComplexity:
+  Max: 10
+  
 # because the complexity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
   Enabled: false
@@ -50,6 +59,10 @@ Style/EmptyLinesAroundModuleBody:
 # because it doesn't make it more readable
 Style/RegexpLiteral:
   Enabled: false
+
+Style/SpaceInsideStringInterpolation:
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
 # because it's silly to care
 Style/StringLiterals:
