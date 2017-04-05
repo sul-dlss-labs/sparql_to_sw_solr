@@ -42,7 +42,9 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
     context 'topic_search' do
       let(:solr_topics) { doc_hash[:topic_search] }
       it_behaves_like 'it_indexes_topics'
-      it 'preserves the entire topic string, including "--", but not trailing punctuation and whitespace' do
+      # In LD4P-DLSS discussions, it was decided that Solr will strip punctuation and whitespace
+      # for the :topic_search field data; it need not be done in ruby.
+      xit 'preserves the entire topic string, including "--", but not trailing punctuation and whitespace' do
         bf_topic = 'abc. -- def ;.  '
         solr_topic = 'abc. -- def'
         solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
@@ -61,11 +63,15 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
         expect(solr_topics).to eq [solr_topic]
       end
 
-      it 'strips everything after a "--" and trailing punctuation and whitespace' do
-        check_parsers('abc. -- def ;.  ', 'abc')
+      # These specs only need to check that the LOC subject separator characters are chomped,
+      # it's not necessary to check all punctuation characters.  In LD4P-DLSS discussions,
+      # it was decided that the `.` character should not be chomped.
+
+      it 'strips everything after a "--" and trailing whitespace and select punctuation' do
+        check_parsers('abc. / \ -- def ;.  ', 'abc.')
       end
-      it 'strips only trailing punctuation and whitespace (not all punctuation)' do
-        check_parsers('abc, def .  ; , !   ', 'abc, def')
+      it 'strips only trailing whitespace and some punctuation (not all punctuation)' do
+        check_parsers('abc, def .  ; , / \   ', 'abc, def .')
       end
       it 'correctly parses a real example' do
         check_parsers('Conductors (Music)--Italy--Biography', 'Conductors (Music)')

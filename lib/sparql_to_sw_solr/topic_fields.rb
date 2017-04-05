@@ -11,14 +11,13 @@ module SparqlToSwSolr
       end
 
       def topics
-        @topics ||= begin
-          results = sparql.query(topic_query)
-          results.map { |r| chomp_nonwords r[:topicLabel] }
+        @topics ||= sparql.query(topic_query).map do |result|
+          result[:topicLabel].to_s
         end
       end
 
       def topics_facet
-        topics.map { |topic| chomp_nonwords(first_topic(topic)) }
+        @topics_facet ||= topics.map { |topic| chomp_nonwords(first_topic(topic)) }
       end
 
       def topic_query
@@ -35,14 +34,11 @@ module SparqlToSwSolr
       end
 
       def first_topic(topic)
-        topic.to_s.split('--').first
+        topic.split('--').first
       end
 
       def chomp_nonwords(topic)
-        parsed = topic.to_s.gsub(/\W*$/, '')
-        parsed += '.' if parsed =~ /etc$/
-        parsed += ')' if parsed =~ /[(]{1}\w*$/
-        parsed
+        topic.gsub(/[\\,:;\/\s]*$/, '')
       end
 
     end
