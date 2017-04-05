@@ -2,6 +2,9 @@ module SparqlToSwSolr
   class InstanceSolrDoc
     module TopicFields
 
+      MADSRDF_NS = 'http://www.loc.gov/mads/rdf/v1#'.freeze
+      MADSRDF_NS_DECL = "PREFIX madsrdf: <#{MADSRDF_NS}>".freeze
+
       private
 
       def add_topic_fields(doc)
