@@ -17,7 +17,7 @@ module SparqlToSwSolr
     BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
     BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
 
-    DOC_SOURCE = 'bibframe'.freeze
+    DOC_SOURCE = 'Bibframe'.freeze
 
     attr_reader :instance_uri
     attr_reader :solr_doc_hash
