@@ -4,7 +4,7 @@ module SparqlToSwSolr
 
       private
 
-      def add_doc_title_fields(doc)
+      def add_title_fields(doc)
         # TODO: what if primary title values aren't single values?
         primary_solutions = primary_title_result
         primary_main_title = values_from_solutions(primary_solutions, 'mainTitle').first
