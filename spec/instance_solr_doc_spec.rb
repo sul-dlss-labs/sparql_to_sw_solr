@@ -67,6 +67,10 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
     end
 
     context 'includes field(s) for' do
+      it 'authors' do
+        expect(isd).to receive(:add_author_fields)
+        isd.solr_doc_hash
+      end
       it 'titles' do
         expect(isd).to receive(:add_title_fields)
         isd.solr_doc_hash
