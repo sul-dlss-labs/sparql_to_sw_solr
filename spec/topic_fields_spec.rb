@@ -42,15 +42,6 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::TopicFields do
     context 'topic_search' do
       let(:solr_topics) { doc_hash[:topic_search] }
       it_behaves_like 'it_indexes_topics'
-      # In LD4P-DLSS discussions, it was decided that Solr will strip punctuation and whitespace
-      # for the :topic_search field data; it need not be done in ruby.
-      xit 'preserves the entire topic string, including "--", but not trailing punctuation and whitespace' do
-        bf_topic = 'abc. -- def ;.  '
-        solr_topic = 'abc. -- def'
-        solutions << RDF::Query::Solution.new(p: 'madsrdf:authoritativeLabel', topicLabel: bf_topic)
-        expect(solr_topics).to be_an Array
-        expect(solr_topics).to include solr_topic
-      end
     end
 
     context 'topic_facet' do
