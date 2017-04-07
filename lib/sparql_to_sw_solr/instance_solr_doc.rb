@@ -75,6 +75,14 @@ module SparqlToSwSolr
       values
     end
 
+    def solution_values_for_binding(solutions, binding_symbol)
+      return unless binding_symbol.is_a?(Symbol)
+      solutions.map do |soln|
+        # need if clause for specs
+        soln[binding_symbol].to_s if soln.bindings.keys.include?(binding_symbol)
+      end
+    end
+
     def sparql
       @sparql ||= SPARQL::Client.new(SPARQL_URL)
     end
