@@ -6,7 +6,7 @@ module SparqlToSwSolr
 
       def add_author_fields(doc)
         primary_contributor = values_from_solutions(primary_contributor_result, 'rdf-schema#label').first
-        doc[:author_1XX_search] = primary_contributor
+        doc[:author_1xx_search] = primary_contributor
         doc[:author_sort] = primary_contributor
 
         contributor_persons = values_from_solutions(contributor_person_result, 'rdf-schema#label')

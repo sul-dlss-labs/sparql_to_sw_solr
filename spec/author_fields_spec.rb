@@ -27,8 +27,8 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::AuthorFields do
     end
   end
 
-  context 'author_1XX_search' do
-    it_behaves_like 'single-valued field', :author_1XX_search
+  context 'author_1xx_search' do
+    it_behaves_like 'single-valued field', :author_1xx_search
   end
 
   context 'author_sort' do
