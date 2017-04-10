@@ -12,10 +12,9 @@ module SparqlToSwSolr
         author_persons = solution_values_for_binding(contributor_person_solns, :author_person)
         author_persons_no_punct = author_persons.map { |c| c.strip.gsub(/[\\.,:;\/ ]+$/, '') if c }
         doc[:author_person_display] = author_persons_no_punct
-        # trailing punctuation removed from author_person_full_display since we aren't getting roles and
-        # we have bibframe data like "Verdi, Giuseppe, 1813-1901," converted from MARC data like
-        # "Verdi, Giuseppe, 1813-1901, composer."
-        doc[:author_person_full_display] = author_persons_no_punct
+        # NOTE: populating author_person_full_display causes duplicate author fields to show in the record view
+        #   We *will* want this field (tho possibly with orig punct) once we add the role info to it (see #37)
+        # doc[:author_person_full_display] = author_persons_no_punct
         doc[:author_person_facet] = author_persons_no_punct
 
         doc

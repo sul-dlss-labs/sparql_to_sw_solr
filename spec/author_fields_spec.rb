@@ -78,10 +78,12 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::AuthorFields do
     it_behaves_like 'display field', :author_person_display
   end
 
-  context 'author_person_full_display' do
-    it_behaves_like 'multi-valued field', :author_person_full_display
-    it_behaves_like 'display field', :author_person_full_display
-  end
+  # We are currently NOT populating this field, as it causes duplicate author fields to show in the record view
+  #  We *will* want this test once we add the role to the author_person_full_display (see #37)
+  # context 'author_person_full_display' do
+  #   it_behaves_like 'multi-valued field', :author_person_full_display
+  #   it_behaves_like 'display field', :author_person_full_display
+  # end
 
   context 'author_person_facet' do
     it_behaves_like 'multi-valued field', :author_person_facet
