@@ -5,45 +5,42 @@ module SparqlToSwSolr
       private
 
       def add_author_fields(doc)
-        primary_contributor = values_from_solutions(primary_contributor_result, 'rdf-schema#label').first
+        primary_contributor = solution_values_for_binding(primary_contributor_solns, :primary_author).first
         doc[:author_1xx_search] = primary_contributor
         doc[:author_sort] = primary_contributor
 
-        contributor_persons = values_from_solutions(contributor_person_result, 'rdf-schema#label')
-        contributor_persons_no_punct = contributor_persons.map { |c| c.strip.gsub(/[\\.,:;\/ ]+$/, '') }
-        doc[:author_person_display] = contributor_persons_no_punct
-        # trailing punctuation removed from author_person_full_display since we aren't getting roles and
-        # we have bibframe data like "Verdi, Giuseppe, 1813-1901," converted from MARC data like
-        # "Verdi, Giuseppe, 1813-1901, composer."
-        doc[:author_person_full_display] = contributor_persons_no_punct
-        doc[:author_person_facet] = contributor_persons_no_punct
+        author_persons = solution_values_for_binding(contributor_person_solns, :author_person)
+        author_persons_no_punct = author_persons.map { |c| c.strip.gsub(/[\\.,:;\/ ]+$/, '') if c }
+        doc[:author_person_display] = author_persons_no_punct
+        # NOTE: populating author_person_full_display causes duplicate author fields to show in the record view
+        #   We *will* want this field (tho possibly with orig punct) once we add the role info to it (see #37)
+        # doc[:author_person_full_display] = author_persons_no_punct
+        doc[:author_person_facet] = author_persons_no_punct
 
         doc
       end
 
-      def primary_contributor_result
+      def primary_contributor_solns
         query = "#{BF_NS_DECL}
-          SELECT ?p ?o WHERE {
+          SELECT ?primary_author WHERE {
             <#{instance_uri}> bf:instanceOf ?work .
             ?work bf:contribution ?contribution .
             ?contribution a <http://id.loc.gov/ontologies/bflc/PrimaryContribution> ;
               bf:agent ?agent .
-            ?agent rdfs:label ?o ;
-              ?p ?o
+            ?agent rdfs:label ?primary_author
           }
         ".freeze
         sparql.query(query)
       end
 
-      def contributor_person_result
+      def contributor_person_solns
         query = "#{BF_NS_DECL}
-          SELECT ?p ?o WHERE {
+          SELECT ?author_person WHERE {
             <#{instance_uri}> bf:instanceOf ?work .
             ?work bf:contribution ?contribution .
             ?contribution bf:agent ?agent .
             ?agent a bf:Agent, bf:Person ;
-              rdfs:label ?o .
-            ?agent ?p ?o
+              rdfs:label ?author_person
           }
         ".freeze
         sparql.query(query)

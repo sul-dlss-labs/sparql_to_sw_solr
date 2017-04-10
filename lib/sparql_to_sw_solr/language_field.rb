@@ -1,4 +1,4 @@
-require_relative 'searchworks_languages'
+require 'stanford-mods' # for SEARCHWORKS_LANGUAGES translation table
 
 module SparqlToSwSolr
   class InstanceSolrDoc

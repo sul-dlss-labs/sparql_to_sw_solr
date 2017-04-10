@@ -17,7 +17,7 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::AuthorFields do
 
     it 'takes first label if there are multiple values' do
       bf_contributors.each do |bf_contributor|
-        solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: bf_contributor)
+        solutions << RDF::Query::Solution.new(primary_author: bf_contributor)
       end
       expect(solr_contributor).to be_a String
       expect(solr_contributor).to eq bf_contributors.first
@@ -41,13 +41,13 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::AuthorFields do
 
     it 'Array when there are multiple values' do
       bf_contributors.each do |bf_contributor|
-        solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: bf_contributor)
+        solutions << RDF::Query::Solution.new(author_person: bf_contributor)
       end
       expect(solr_contributor).to be_an Array
       expect(solr_contributor).to eq bf_contributors
     end
     it 'Array when there is a single value' do
-      solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: bf_contributors.first)
+      solutions << RDF::Query::Solution.new(author_person: bf_contributors.first)
       expect(solr_contributor).to be_an Array
       expect(solr_contributor).to eq [bf_contributors.first]
     end
@@ -59,16 +59,16 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::AuthorFields do
   shared_examples 'display field' do |solr_field_name|
     it 'removes trailing spaces and \\.,:;/' do
       ['\\', '\.', ',', ':', ';', '/'].each do |punct|
-        solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: "foo#{punct}")
+        solutions << RDF::Query::Solution.new(author_person: "foo#{punct}")
         expect(doc_hash[solr_field_name]).to eq ['foo']
       end
     end
     it 'removes trailing combinations of spaces and \\.,:;/' do
-      solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: "foo ;/: ")
+      solutions << RDF::Query::Solution.new(author_person: "foo ;/: ")
       expect(doc_hash[solr_field_name]).to eq ['foo']
     end
     it 'removes leading whitespace' do
-      solutions << RDF::Query::Solution.new(p: 'rdf-schema#label', o: " foo")
+      solutions << RDF::Query::Solution.new(author_person: " foo")
       expect(doc_hash[solr_field_name]).to eq ['foo']
     end
   end
@@ -78,10 +78,12 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::AuthorFields do
     it_behaves_like 'display field', :author_person_display
   end
 
-  context 'author_person_full_display' do
-    it_behaves_like 'multi-valued field', :author_person_full_display
-    it_behaves_like 'display field', :author_person_full_display
-  end
+  # We are currently NOT populating this field, as it causes duplicate author fields to show in the record view
+  #  We *will* want this test once we add the role to the author_person_full_display (see #37)
+  # context 'author_person_full_display' do
+  #   it_behaves_like 'multi-valued field', :author_person_full_display
+  #   it_behaves_like 'display field', :author_person_full_display
+  # end
 
   context 'author_person_facet' do
     it_behaves_like 'multi-valued field', :author_person_facet
