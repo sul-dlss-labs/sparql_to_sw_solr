@@ -1,5 +1,6 @@
 require 'linkeddata'
 require_relative 'author_fields'
+require_relative 'instance_pub_fields'
 require_relative 'instance_title_fields'
 require_relative 'language_field'
 require_relative 'topic_fields'
@@ -7,6 +8,7 @@ require_relative 'topic_fields'
 module SparqlToSwSolr
   class InstanceSolrDoc
     include AuthorFields
+    include InstancePubFields
     include InstanceTitleFields
     include LanguageField
     include TopicFields
@@ -43,6 +45,7 @@ module SparqlToSwSolr
         doc = init_doc
         doc[:language] = language_values
         add_author_fields(doc)
+        add_publication_fields(doc)
         add_title_fields(doc)
         add_topic_fields(doc)
         doc
@@ -73,6 +76,14 @@ module SparqlToSwSolr
         values << soln.o.to_s if soln.p.end_with?(predicate_name)
       end
       values
+    end
+
+    def solution_values_for_binding(solutions, binding_symbol)
+      return unless binding_symbol.is_a?(Symbol)
+      solutions.map do |soln|
+        # need if clause for specs
+        soln[binding_symbol].to_s if soln.bindings.keys.include?(binding_symbol)
+      end
     end
 
     def sparql

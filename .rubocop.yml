@@ -12,7 +12,7 @@ Bundler/OrderedGems:
   Exclude:
     - 'Gemfile'
 
-# because we have code that is clearer this way
+# because field values have concatenation and punctuation
 Metrics/AbcSize:
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
@@ -21,9 +21,10 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/**'
 
-# because some of these methods will need to be a bit complex to deal with punctuation
+# because methods deal with punctuation
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
 # because this isn't 1970
 Metrics/LineLength:
@@ -31,17 +32,19 @@ Metrics/LineLength:
   Exclude:
     - 'spec/instance_solr_doc_spec.rb'
 
-# because some of these methods will need to be long
+# because methods assigning many fields can still be clear if a little longer
+# and because field values have concatenation and punctuation
 Metrics/MethodLength:
+  Max: 12
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
-    - 'lib/sparql_to_sw_solr/author_fields.rb'
 
-# because some of these methods will need to be a bit complex to deal with punctuation
+# because methods deal with punctuation
 Metrics/PerceivedComplexity:
-  Max: 10
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
-# because the complexity of this app and its classes shouldn't require this with good naming
+# because the simplicity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
   Enabled: false
 
@@ -60,10 +63,6 @@ Style/EmptyLinesAroundModuleBody:
 # because it doesn't make it more readable
 Style/RegexpLiteral:
   Enabled: false
-
-Style/SpaceInsideStringInterpolation:
-  Exclude:
-    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
 # because it's silly to care
 Style/StringLiterals:
