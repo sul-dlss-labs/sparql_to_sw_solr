@@ -142,9 +142,9 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_display]).to eq 'bar'
       end
-      it 'empty String if no mainTitle or subtitle value' do
+      it 'nil if no mainTitle or subtitle value' do
         expect(sparql_conn).to receive(:query).and_return(solutions)
-        expect(doc_hash[:title_display]).to eq ''
+        expect(doc_hash[:title_display]).to eq nil
       end
       it 'removes trailing punctuation' do
         ['\\', ',', ':', ';', '/'].each do |punct|
@@ -188,9 +188,9 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           title_display = doc_hash[:title_display]
           expect(doc_hash[:title_full_display]).to eq(title_display)
         end
-        it 'empty if no title_display value' do
+        it 'nil if no title_display value' do
           expect(sparql_conn).to receive(:query).and_return(solutions)
-          expect(doc_hash[:title_full_display]).to eq ''
+          expect(doc_hash[:title_full_display]).to eq nil
         end
       end
 
@@ -241,16 +241,16 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       end
 
       context 'no title_display' do
-        it 'Empty if no title_display or resp statement' do
+        it 'nil if no title_display or resp statement' do
           expect(sparql_conn).to receive(:query).and_return(solutions)
-          expect(doc_hash[:title_display]).to eq ''
-          expect(doc_hash[:title_full_display]).to eq ''
+          expect(doc_hash[:title_display]).to eq nil
+          expect(doc_hash[:title_full_display]).to eq nil
         end
         it 'responsibility statement without prefix separator if no title_display value' do
           expect(sparql_conn).to receive(:query).and_return(solutions)
           solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: 'roo')
           allow(isd).to receive(:sparql).and_return(sparql_conn)
-          expect(doc_hash[:title_display]).to eq ''
+          expect(doc_hash[:title_display]).to eq nil
           expect(doc_hash[:title_full_display]).to eq 'roo'
         end
       end
@@ -265,4 +265,20 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       isd.send(:primary_title_result)
     end
   end
+
+  context '#values_from_solutions' do
+    let(:solutions) do
+      solutions = RDF::Query::Solutions.new
+      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'foo')
+      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'bar')
+    end
+    it 'returns array of values for passed predicate name (matching using endsWith (ignoring namespace))' do
+      expect(isd.send(:values_from_solutions, solutions, 'bf:mainTitle')).to eq ['foo', 'bar']
+      expect(isd.send(:values_from_solutions, solutions, 'mainTitle')).to eq ['foo', 'bar']
+    end
+    it 'returns empty array if no matching predicate name' do
+      expect(isd.send(:values_from_solutions, solutions, 'zzzzz')).to eq []
+    end
+  end
+
 end

@@ -67,23 +67,19 @@ module SparqlToSwSolr
       @ckey ||= self.class.instance_uri_to_ckey(@instance_uri)
     end
 
-    # SPARQL results expected to have "p" for predicate and "o" for object as results
-    def values_from_solutions(solutions, predicate_name)
-      values = []
-      solutions.each_solution do |soln|
-        # need next line for specs
-        next unless soln.bindings.keys.include?(:o) && soln.bindings.keys.include?(:p)
-        values << soln.o.to_s if soln.p.end_with?(predicate_name)
-      end
-      values
-    end
-
     def solution_values_for_binding(solutions, binding_symbol)
       return unless binding_symbol.is_a?(Symbol)
       solutions.map do |soln|
         # need if clause for specs
         soln[binding_symbol].to_s if soln.bindings.keys.include?(binding_symbol)
       end
+    end
+
+    def concatenate_values(val1, separator, val2)
+      result = "#{val1}" \
+      "#{present?(val1) && present?(val2) ? separator : nil}" \
+      "#{val2}"
+      result unless result.empty?
     end
 
     def sparql

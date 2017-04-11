@@ -7,19 +7,20 @@ module SparqlToSwSolr
       def add_title_fields(doc)
         # TODO: what if primary title values aren't single values?
         primary_solutions = primary_title_result
+        # TODO: is this appropriate if primary title values aren't single values?
         primary_main_title = values_from_solutions(primary_solutions, 'mainTitle').first
         doc[:title_245a_search] = primary_main_title
         doc[:title_245_search] = values_from_solutions(primary_solutions, 'rdf-schema#label').first
-        doc[:title_245a_display] = primary_main_title.strip.gsub(/[\\,:;\/ ]+$/, '') if primary_main_title
-        primary_subtitle = values_from_solutions(primary_solutions, 'subtitle').first
-        # TODO: what should separator be? what if main title ends with '=' ?
-        doc[:title_display] = "#{primary_main_title.strip.gsub(/[\\,:;\/ ]+$/, '') if primary_main_title}" \
-                              "#{present?(primary_subtitle) && present?(primary_main_title) ? ' : ' : nil}" \
-                              "#{primary_subtitle.strip.gsub(/[\\,:;\/ ]+$/, '') if primary_subtitle}"
-        resp_statement = values_from_solutions(primary_solutions, 'responsibilityStatement').first
-        doc[:title_full_display] = "#{doc[:title_display]}" \
-                                   "#{present?(doc[:title_display]) && present?(resp_statement) ? ' / ' : nil}" \
-                                   "#{resp_statement.gsub(/[\\,:;\/ ]+$/, '') if resp_statement}"
+
+        primary_main_title_no_punct = scrub_title_val(primary_main_title)
+        doc[:title_245a_display] = primary_main_title_no_punct
+
+        primary_subtitle = scrub_title_val(values_from_solutions(primary_solutions, 'subtitle').first)
+        # TODO: what if main title ends with '=' ?
+        doc[:title_display] = concatenate_values(primary_main_title_no_punct, ' : ', primary_subtitle)
+
+        resp_statement = scrub_title_val(values_from_solutions(primary_solutions, 'responsibilityStatement').first)
+        doc[:title_full_display] = concatenate_values(doc[:title_display], ' / ', resp_statement)
         doc
       end
 
@@ -40,6 +41,23 @@ module SparqlToSwSolr
             }
           }".freeze
         sparql.query(query)
+      end
+
+      # SPARQL results expected to have "p" for predicate and "o" for object as results
+      def values_from_solutions(solutions, predicate_name)
+        values = []
+        solutions.each_solution do |soln|
+          # need next line for specs
+          next unless soln.bindings.keys.include?(:o) && soln.bindings.keys.include?(:p)
+          values << soln.o.to_s if soln.p.end_with?(predicate_name)
+        end
+        values
+      end
+
+      # remove leading and trailing whitespace;
+      # remove trailing chars \,:;/
+      def scrub_title_val(val)
+        val.strip.gsub(/[\\,:;\/ ]+$/, '') if val
       end
 
       def present?(string)

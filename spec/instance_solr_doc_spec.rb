@@ -91,18 +91,27 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
     end
   end
 
-  context '#values_from_solutions' do
-    let(:solutions) do
-      solutions = RDF::Query::Solutions.new
-      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'foo')
-      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'bar')
+  context '#concatenate_values' do
+    let(:val1) { 'toe' }
+    let(:sep) { ' floof ' }
+    let(:val2) { 'rocks' }
+    it 'is string val1 + separator + val2 when val1 and val2 both exist' do
+      expect(isd.send(:concatenate_values, val1, sep, val2)).to eq 'toe floof rocks'
     end
-    it 'returns array of values for passed predicate name (matching using endsWith (ignoring namespace))' do
-      expect(isd.send(:values_from_solutions, solutions, 'bf:mainTitle')).to eq ['foo', 'bar']
-      expect(isd.send(:values_from_solutions, solutions, 'mainTitle')).to eq ['foo', 'bar']
+    it 'nil if val1 and val2 both nil' do
+      expect(isd.send(:concatenate_values, nil, sep, nil)).to eq nil
     end
-    it 'returns empty array if no matching predicate name' do
-      expect(isd.send(:values_from_solutions, solutions, 'zzzzz')).to eq []
+    it 'outputs only val1 (no sep) when nil val2' do
+      expect(isd.send(:concatenate_values, val1, sep, nil)).to eq val1
+    end
+    it 'outputs only val1 (no sep) when val2 is empty string' do
+      expect(isd.send(:concatenate_values, val1, sep, '')).to eq val1
+    end
+    it 'outputs only val2 (no sep) when nil val1' do
+      expect(isd.send(:concatenate_values, nil, sep, val2)).to eq val2
+    end
+    it 'outputs only val2 (no sep) when val1 is empty string' do
+      expect(isd.send(:concatenate_values, '', sep, val2)).to eq val2
     end
   end
 end
