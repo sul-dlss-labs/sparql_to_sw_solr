@@ -41,8 +41,7 @@ module SparqlToSwSolr
       def pub_year_solutions
         query = "#{BF_NS_DECL}
           SELECT ?pub_year WHERE {
-            <#{instance_uri}> a bf:Instance ;
-              bf:provisionActivity ?prov_activity .
+            <#{instance_uri}> bf:provisionActivity ?prov_activity .
             ?prov_activity a bf:Publication ,
                   bf:ProvisionActivity .
             ?prov_activity bf:date ?pub_year .
