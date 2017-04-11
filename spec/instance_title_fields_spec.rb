@@ -265,4 +265,20 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       isd.send(:primary_title_result)
     end
   end
+
+  context '#values_from_solutions' do
+    let(:solutions) do
+      solutions = RDF::Query::Solutions.new
+      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'foo')
+      solutions << RDF::Query::Solution.new(p: 'bf:mainTitle', o: 'bar')
+    end
+    it 'returns array of values for passed predicate name (matching using endsWith (ignoring namespace))' do
+      expect(isd.send(:values_from_solutions, solutions, 'bf:mainTitle')).to eq ['foo', 'bar']
+      expect(isd.send(:values_from_solutions, solutions, 'mainTitle')).to eq ['foo', 'bar']
+    end
+    it 'returns empty array if no matching predicate name' do
+      expect(isd.send(:values_from_solutions, solutions, 'zzzzz')).to eq []
+    end
+  end
+
 end

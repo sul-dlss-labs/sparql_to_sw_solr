@@ -42,6 +42,17 @@ module SparqlToSwSolr
         sparql.query(query)
       end
 
+      # SPARQL results expected to have "p" for predicate and "o" for object as results
+      def values_from_solutions(solutions, predicate_name)
+        values = []
+        solutions.each_solution do |soln|
+          # need next line for specs
+          next unless soln.bindings.keys.include?(:o) && soln.bindings.keys.include?(:p)
+          values << soln.o.to_s if soln.p.end_with?(predicate_name)
+        end
+        values
+      end
+
       def present?(string)
         string && !string.empty?
       end
