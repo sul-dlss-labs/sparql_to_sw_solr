@@ -75,6 +75,13 @@ module SparqlToSwSolr
       end
     end
 
+    def concatenate_values(val1, separator, val2)
+      result = "#{val1}" \
+      "#{present?(val1) && present?(val2) ? separator : nil}" \
+      "#{val2}"
+      result unless result.empty?
+    end
+
     def sparql
       @sparql ||= SPARQL::Client.new(SPARQL_URL)
     end
