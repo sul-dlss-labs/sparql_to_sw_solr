@@ -40,6 +40,7 @@ Metrics/MethodLength:
   Max: 12
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
+    - 'lib/sparql_to_sw_solr/physical_field.rb'
 
 # because the simplicity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
