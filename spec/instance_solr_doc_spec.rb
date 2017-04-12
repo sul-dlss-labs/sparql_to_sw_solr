@@ -102,8 +102,8 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
     it 'is string val1 + separator + val2 when val1 and val2 both exist' do
       expect(isd.send(:concatenate_values, val1, sep, val2)).to eq 'toe floof rocks'
     end
-    it 'nil if val1 and val2 both nil' do
-      expect(isd.send(:concatenate_values, nil, sep, nil)).to eq nil
+    it 'empty if val1 and val2 both nil' do
+      expect(isd.send(:concatenate_values, nil, sep, nil)).to be_empty
     end
     it 'outputs only val1 (no sep) when nil val2' do
       expect(isd.send(:concatenate_values, val1, sep, nil)).to eq val1

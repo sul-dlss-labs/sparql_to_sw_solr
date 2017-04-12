@@ -142,9 +142,9 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
         expect(sparql_conn).to receive(:query).and_return(solutions)
         expect(doc_hash[:title_display]).to eq 'bar'
       end
-      it 'nil if no mainTitle or subtitle value' do
+      it 'empty if no mainTitle or subtitle value' do
         expect(sparql_conn).to receive(:query).and_return(solutions)
-        expect(doc_hash[:title_display]).to eq nil
+        expect(doc_hash[:title_display]).to be_empty
       end
       it 'removes trailing punctuation' do
         ['\\', ',', ':', ';', '/'].each do |punct|
@@ -188,9 +188,9 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
           title_display = doc_hash[:title_display]
           expect(doc_hash[:title_full_display]).to eq(title_display)
         end
-        it 'nil if no title_display value' do
+        it 'is empty if no title_display value' do
           expect(sparql_conn).to receive(:query).and_return(solutions)
-          expect(doc_hash[:title_full_display]).to eq nil
+          expect(doc_hash[:title_full_display]).to be_empty
         end
       end
 
@@ -241,16 +241,16 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceTitleFields do
       end
 
       context 'no title_display' do
-        it 'nil if no title_display or resp statement' do
+        it 'is empty if no title_display or resp statement' do
           expect(sparql_conn).to receive(:query).and_return(solutions)
-          expect(doc_hash[:title_display]).to eq nil
-          expect(doc_hash[:title_full_display]).to eq nil
+          expect(doc_hash[:title_display]).to be_empty
+          expect(doc_hash[:title_full_display]).to be_empty
         end
         it 'responsibility statement without prefix separator if no title_display value' do
           expect(sparql_conn).to receive(:query).and_return(solutions)
           solutions << RDF::Query::Solution.new(p: 'responsibilityStatement', o: 'roo')
           allow(isd).to receive(:sparql).and_return(sparql_conn)
-          expect(doc_hash[:title_display]).to eq nil
+          expect(doc_hash[:title_display]).to be_empty
           expect(doc_hash[:title_full_display]).to eq 'roo'
         end
       end
