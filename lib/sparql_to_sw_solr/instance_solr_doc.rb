@@ -4,6 +4,7 @@ require_relative 'instance_pub_fields'
 require_relative 'instance_title_fields'
 require_relative 'language_field'
 require_relative 'topic_fields'
+require_relative 'physical_field'
 
 module SparqlToSwSolr
   class InstanceSolrDoc
@@ -12,6 +13,7 @@ module SparqlToSwSolr
     include InstanceTitleFields
     include LanguageField
     include TopicFields
+    include PhysicalField
 
     # TODO: get these from settings.yml
     SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
@@ -44,6 +46,7 @@ module SparqlToSwSolr
         return if CKEY_BLACKLIST.include?(@ckey)
         doc = init_doc
         doc[:language] = language_values
+        doc[:physical] = physical_values
         add_author_fields(doc)
         add_publication_fields(doc)
         add_title_fields(doc)

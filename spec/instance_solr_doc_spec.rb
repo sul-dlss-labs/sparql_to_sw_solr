@@ -88,6 +88,10 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
         expect(isd).to receive(:language_values).and_return(lang_value)
         expect(doc_hash).to include(language: lang_value)
       end
+      it 'physical field' do
+        expect(isd).to receive(:physical_values).and_return('')
+        isd.solr_doc_hash
+      end
     end
   end
 
