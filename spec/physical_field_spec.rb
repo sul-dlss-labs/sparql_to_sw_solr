@@ -31,19 +31,21 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::PhysicalField do
       physical_values = isd.send(:physical_values)
       expect(physical_values).to eq '15 p. : ill. ; 5 x 5 in. + CD'
     end
+    # extentLabel_1 is a required field according to the MARC specification, but check incase it's empty
     it 'Concatenates the physical_details correctly if there is no extentLabel_1' do
       solutions << RDF::Query::Solution.new(noteType: 'Physical details',
-                                            extentLabel_1: nil,
+                                            extentLabel_1: '',
                                             noteLabel: 'ill.',
                                             instanceDimensions_3: '5 x 5 in.')
       physical_values = isd.send(:physical_values)
       expect(physical_values).to eq 'ill. ; 5 x 5 in.'
     end
+    # instanceDimensions_3 is a required field according to the MARC specification, but check incase it's empty
     it 'Concatenates the physical_details correctly if there is no instanceDimensions_3' do
       solutions << RDF::Query::Solution.new(noteType: 'Physical details',
                                             extentLabel_1: '15 p.',
                                             noteLabel: 'ill.',
-                                            instanceDimensions_3: nil)
+                                            instanceDimensions_3: '')
       physical_values = isd.send(:physical_values)
       expect(physical_values).to eq '15 p. : ill.'
     end
@@ -60,7 +62,8 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::PhysicalField do
                                             noteLabel: 'ill.',
                                             instanceDimensions_3: '5 x 5 in.')
       physical_values = isd.send(:physical_values)
-      expect(physical_values).to eq nil
+      # expect(physical_values).to eq nil
+      expect(physical_values).to eq '15 p. ; 5 x 5 in.'
     end
   end
 end
