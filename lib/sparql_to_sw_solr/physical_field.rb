@@ -32,23 +32,23 @@ module SparqlToSwSolr
         concatenate_values(extent_details_dimensions, ' + ', @physical4)
       end
 
-      # extentLabel_1 and instanceDimensions_3 are required fields according to the MARC specification
       def physical_solutions
-        @physical_solutions ||= begin
-          query = "#{BF_NS_DECL}
+        @physical_solutions ||= sparql.query(physical_query)
+      end
+
+      # extentLabel_1 and instanceDimensions_3 are required fields according to the MARC specification
+      def physical_query
+        @physical_query ||= begin
+          "#{BF_NS_DECL}
           SELECT distinct ?extentLabel_1 ?noteType ?noteLabel ?instanceDimensions_3
           WHERE {
             <#{instance_uri}> bf:extent ?e .
             ?e rdfs:label ?extentLabel_1 .
             <#{instance_uri}> bf:dimensions ?instanceDimensions_3 .
-            OPTIONAL {
-              <#{instance_uri}> bf:note ?note .
-              ?note bf:noteType ?noteType;
-              	  rdfs:label ?noteLabel .
-            }
-          }
-          ".freeze
-          sparql.query(query)
+            OPTIONAL { <#{instance_uri}> bf:note ?note .
+                       ?note bf:noteType ?noteType;
+              	             rdfs:label ?noteLabel . }
+          }".freeze
         end
       end
     end
