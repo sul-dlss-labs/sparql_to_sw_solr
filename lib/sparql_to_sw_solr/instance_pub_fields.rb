@@ -9,7 +9,7 @@ module SparqlToSwSolr
       def add_publication_fields(doc)
         add_pub_year_fields(doc)
         doc[:imprint_display] = imprint_display
-        # doc[:pub_search] = ''
+        doc[:pub_search] = pub_search
         doc
       end
 
@@ -83,7 +83,7 @@ module SparqlToSwSolr
       end
 
       def manufacture_solns
-        # the query below avoids Manufacture info from marc 008 by filter to blank nodes for place
+        # the query below avoids Manufacture info from marc 008 by filtering to only blank nodes for place
         #   and filtering out edtf datatype for dates
         query = "#{BF_NS_DECL}
           SELECT ?manu_place ?manu_agent ?manu_date
@@ -103,6 +103,54 @@ module SparqlToSwSolr
             OPTIONAL {
               ?provision bf:date ?manu_date .
               FILTER (datatype(?manu_date) != <http://id.loc.gov/datatypes/edtf> )
+            }
+          }"
+        sparql.query(query)
+      end
+
+      def pub_search
+        result = ''
+        provision_activity_solns.each do |soln|
+          place = soln.place_val.to_s if soln && soln.bindings.keys.include?(:place_val)
+          result << "#{place} " if searchable_place?(place)
+          agent = soln.agent_val.to_s if soln && soln.bindings.keys.include?(:agent_val)
+          result << "#{agent} " if searchable_agent?(agent)
+        end
+        result.strip unless result.strip.empty?
+      end
+
+      def searchable_place?(place)
+        if !present?(place) || place.match(/.*s\.l\..*/i) || place.match(/.*place of .* not identified.*/i)
+          false
+        else
+          true
+        end
+      end
+
+      def searchable_agent?(agent)
+        if !present?(agent) || agent.match(/.*s\.n\..*/i) || agent.match(/.*r not identified.*/i)
+          false
+        else
+          true
+        end
+      end
+
+      def provision_activity_solns
+        # the query below avoids info from marc 008 by filtering to only blank nodes for place
+        query = "#{BF_NS_DECL}
+          SELECT ?place_val ?agent_val
+          WHERE {
+            <#{instance_uri}> a bf:Instance .
+            <#{instance_uri}> bf:provisionActivity ?provision .
+
+            OPTIONAL {
+              ?provision bf:place ?place .
+              FILTER isBlank (?place) .
+              ?place rdfs:label ?place_val .
+            }
+            OPTIONAL {
+              ?provision bf:agent ?agent .
+              ?agent rdfs:label ?agent_val .
             }
           }"
         sparql.query(query)
