@@ -16,7 +16,8 @@ module SparqlToSwSolr
     include PhysicalField
 
     # TODO: get these from settings.yml
-    SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
+    SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/bibframe2_201704/sparql'.freeze
+    # SPARQL_URL = 'http://localhost:8080/blazegraph/namespace/ld4p/sparql'.freeze
     # SPARQL_URL = 'http://sul-ld4p-blazegraph-dev.stanford.edu/blazegraph/namespace/ld4p/sparql'.freeze
     BASE_URI = 'http://ld4p-test.stanford.edu/'.freeze
 
