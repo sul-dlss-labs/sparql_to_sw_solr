@@ -12,20 +12,23 @@ Bundler/OrderedGems:
   Exclude:
     - 'Gemfile'
 
-# because field values have concatenation and punctuation
+# because field values are complex (e.g. concatenation, punctuation, selecting from options)
 Metrics/AbcSize:
   Exclude:
-    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
+    - 'lib/sparql_to_sw_solr/instance_std_num_fields.rb'
+    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
 Metrics/BlockLength:
   Exclude:
     - 'spec/**'
 
-# because methods deal with punctuation
+# because methods deal with punctuation or choosing values based on what is present
 Metrics/CyclomaticComplexity:
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
+    - 'lib/sparql_to_sw_solr/instance_std_num_fields.rb'
+    - 'lib/sparql_to_sw_solr/instance_title_fields.rb'
 
 # because this isn't 1970
 Metrics/LineLength:
@@ -37,7 +40,7 @@ Metrics/LineLength:
 # and because field values have concatenation and punctuation
 # and because sparql queries can be long
 Metrics/MethodLength:
-  Max: 13
+  Max: 15
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
 
@@ -46,10 +49,11 @@ Metrics/ModuleLength:
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
 
-# because pub_search method is already at a sweet spot for refactoring vs readability
+# because methods choose values based on two vars and what is present overall
 Metrics/PerceivedComplexity:
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
+    - 'lib/sparql_to_sw_solr/instance_std_num_fields.rb'
 
 # because the simplicity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
