@@ -6,6 +6,7 @@ module SparqlToSwSolr
 
       def add_std_num_fields(doc)
         doc[:oclc] = oclc_nums
+        doc[:lccn] = lccn # single valued Solr field
         doc
       end
 
@@ -41,6 +42,34 @@ module SparqlToSwSolr
                rdf:value ?value ;
                bf:source ?src .
             ?src rdfs:label ?label
+          }"
+        sparql.query(query)
+      end
+
+      # lccn is a single valued Solr field
+      def lccn
+        invalid = []
+        lccn_solns.each do |soln|
+          # need if clauses for specs
+          value = soln.lccn_value.to_s if soln && soln.bindings.keys.include?(:lccn_value)
+          label = soln.status_label.to_s.strip if soln && soln.bindings.keys.include?(:status_label)
+          return value unless present?(label)
+          invalid << value if label == 'invalid'
+        end
+        return invalid.first unless invalid.empty?
+      end
+
+      def lccn_solns
+        query = "#{BF_NS_DECL}
+          SELECT ?lccn_value ?status_label WHERE {
+            <#{instance_uri}> bf:identifiedBy ?i .
+            ?i a bf:Lccn ;
+               rdf:value ?lccn_value .
+            OPTIONAL {
+              ?i bf:status ?status .
+              ?status a bf:Status ;
+                      rdfs:label ?status_label
+            }
           }"
         sparql.query(query)
       end

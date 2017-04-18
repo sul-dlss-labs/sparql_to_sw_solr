@@ -16,6 +16,10 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceStdNumFields do
       expect(isd).to receive(:oclc_nums)
       isd.solr_doc_hash
     end
+    it 'includes lccn field' do
+      expect(isd).to receive(:lccn)
+      isd.solr_doc_hash
+    end
   end
 
   context '#oclc_nums' do
@@ -68,4 +72,27 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstanceStdNumFields do
     end
   end
 
+  context '#lccn' do
+    let(:valid) { 'mmmmm' }
+    let(:invalid_val) { 'yuck' }
+    let(:invalid_label) { 'invalid' }
+
+    it 'String (not Array) of first valid value if more than one exists' do
+      solutions << RDF::Query::Solution.new(lccn_value: valid)
+      solutions << RDF::Query::Solution.new(lccn_value: 'other')
+      expect(isd.send(:lccn)).to eq valid
+    end
+    it 'valid value chosen if both valid and invalid' do
+      solutions << RDF::Query::Solution.new(lccn_value: valid)
+      solutions << RDF::Query::Solution.new(lccn_value: invalid_val, status_label: invalid_label)
+      expect(isd.send(:lccn)).to eq valid
+    end
+    it 'invalid value chosen if no valid value' do
+      solutions << RDF::Query::Solution.new(lccn_value: invalid_val, status_label: invalid_label)
+      expect(isd.send(:lccn)).to eq invalid_val
+    end
+    it 'nil if no values' do
+      expect(isd.send(:lccn)).to eq nil
+    end
+  end
 end
