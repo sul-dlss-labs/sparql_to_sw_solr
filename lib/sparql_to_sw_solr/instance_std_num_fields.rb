@@ -7,6 +7,7 @@ module SparqlToSwSolr
       def add_std_num_fields(doc)
         doc[:oclc] = oclc_nums
         doc[:lccn] = lccn # single valued Solr field
+        doc[:isbn_display] = isbn_display_vals
         doc
       end
 
@@ -74,6 +75,34 @@ module SparqlToSwSolr
         sparql.query(query)
       end
 
+      def isbn_display_vals
+        valid = []
+        invalid = []
+        isbn_display_solns.each do |soln|
+          # need if clauses for specs
+          value = soln.isbn_value.to_s.strip if soln && soln.bindings.keys.include?(:isbn_value)
+          label = soln.status_label.to_s.strip if soln && soln.bindings.keys.include?(:status_label)
+          valid << value unless present?(label)
+          invalid << value if label == 'invalid'
+        end
+        return valid unless valid.empty?
+        invalid
+      end
+
+      def isbn_display_solns
+        query = "#{BF_NS_DECL}
+          SELECT ?isbn_value ?status_label WHERE {
+            <#{instance_uri}> bf:identifiedBy ?i .
+            ?i a bf:Isbn ;
+               rdf:value ?isbn_value .
+            OPTIONAL {
+              ?i bf:status ?status .
+              ?status a bf:Status ;
+                      rdfs:label ?status_label
+            }
+          }"
+        sparql.query(query)
+      end
     end
   end
 end
