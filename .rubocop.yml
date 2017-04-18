@@ -41,6 +41,16 @@ Metrics/MethodLength:
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
 
+# because there is logic for three separate publication related fields, and it's < 200 lines
+Metrics/ModuleLength:
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
+
+# because pub_search method is already at a sweet spot for refactoring vs readability
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
+
 # because the simplicity of this app and its classes shouldn't require this with good naming
 Style/Documentation:
   Enabled: false
@@ -56,6 +66,11 @@ Style/EmptyLinesAroundClassBody:
 # because it can make the code more skimmable/readable
 Style/EmptyLinesAroundModuleBody:
   Enabled: false
+
+# because it doesn't make the spec more readable
+Style/MixinGrouping:
+  Exclude:
+    - 'spec/instance_pub_fields_spec.rb'
 
 # because it doesn't make it more readable
 Style/RegexpLiteral:

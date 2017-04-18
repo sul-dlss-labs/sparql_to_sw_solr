@@ -20,6 +20,10 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstancePubFields do
       expect(isd).to receive(:imprint_display)
       isd.solr_doc_hash
     end
+    it 'includes pub_search field' do
+      expect(isd).to receive(:pub_search)
+      isd.solr_doc_hash
+    end
   end
 
   context '#add_pub_year_fields' do
@@ -212,10 +216,57 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstancePubFields do
       solutions << RDF::Query::Solution.new(manu_date: manu_date)
       expect(isd.send(:manu_info)).to eq manu_date
     end
+    it 'nil when no manu_place, manu_agent or manu_date' do
+      expect(isd.send(:manu_info)).to be nil
+    end
     it 'uses first bf:Manufacture provisionActivity if more than one exists' do
       solutions << RDF::Query::Solution.new(manu_place: manu_place, manu_date: manu_date)
       solutions << RDF::Query::Solution.new(manu_agent: manu_agent)
       expect(isd.send(:manu_info)).to eq "#{manu_place} : #{manu_date}"
+    end
+  end
+
+  context '#pub_search' do
+    let(:places) { ['foo', 's.l.', 'place of publication not identified', 'bar'] }
+    let(:agents) { ['wine', 's.n.', 'manufacturer not identified', 'cheese'] }
+    it 'includes agents and places when both are present' do
+      solutions << RDF::Query::Solution.new(place_val: places.first, agent_val: agents.first)
+      solutions << RDF::Query::Solution.new(place_val: places.last, agent_val: agents.last)
+      expect(isd.send(:pub_search)).to include agents.first, agents.last, places.first, places.last
+    end
+
+    it 'excludes places with "s.l."' do
+      solutions << RDF::Query::Solution.new(place_val: places[1])
+      expect(isd.send(:pub_search)).to be nil
+    end
+    it 'excludes places with "place of blah not identified"' do
+      solutions << RDF::Query::Solution.new(place_val: places[2])
+      expect(isd.send(:pub_search)).to be nil
+    end
+    it 'includes all other places' do
+      places.each { |pl| solutions << RDF::Query::Solution.new(place_val: pl) }
+      expect(isd.send(:pub_search)).to include places.first, places.last
+    end
+    it 'excludes agents with "s.n."' do
+      solutions << RDF::Query::Solution.new(agent_val: agents[1])
+      expect(isd.send(:pub_search)).to be nil
+    end
+    it 'excludes agents with "blahr not identified"' do
+      solutions << RDF::Query::Solution.new(agent_val: agents[2])
+      expect(isd.send(:pub_search)).to be nil
+    end
+    it 'includes all other agents' do
+      agents.each { |a| solutions << RDF::Query::Solution.new(agent_val: a) }
+      expect(isd.send(:pub_search)).to include agents.first, agents.last
+    end
+    it 'nil when no places or agents' do
+      expect(isd.send(:pub_search)).to be nil
+    end
+    it 'includes places when no agents' do
+      # see tests for places above
+    end
+    it 'includes agents when no places' do
+      # see tests for agents above
     end
   end
 end
