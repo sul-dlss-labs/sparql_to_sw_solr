@@ -37,7 +37,7 @@ Metrics/LineLength:
 # and because field values have concatenation and punctuation
 # and because sparql queries can be long
 Metrics/MethodLength:
-  Max: 12
+  Max: 13
   Exclude:
     - 'lib/sparql_to_sw_solr/instance_pub_fields.rb'
 

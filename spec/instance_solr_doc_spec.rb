@@ -75,6 +75,10 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc do
         expect(isd).to receive(:add_publication_fields)
         isd.solr_doc_hash
       end
+      it 'standard numbers' do
+        expect(isd).to receive(:add_std_num_fields)
+        isd.solr_doc_hash
+      end
       it 'titles' do
         expect(isd).to receive(:add_title_fields)
         isd.solr_doc_hash
