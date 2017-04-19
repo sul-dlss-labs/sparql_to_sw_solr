@@ -130,8 +130,8 @@ RSpec.describe SparqlToSwSolr::InstanceSolrDoc::InstancePubFields do
       exp_val = "#{edition_val} - #{pub_info}. #{manu_place} : #{manu_agent}, #{manu_date}"
       expect(isd.send(:imprint_display)).to eq exp_val
     end
-    it 'is nil if there is no value for edition, publication or manufacture' do
-      expect(isd.send(:imprint_display)).to be nil
+    it 'is empty if there is no value for edition, publication or manufacture' do
+      expect(isd.send(:imprint_display)).to be_empty
     end
     it 'publication + manufacture if no edition info' do
       pub_solns = RDF::Query::Solutions.new
