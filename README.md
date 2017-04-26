@@ -8,6 +8,9 @@
 
 Perform SPARQL queries against a triplestore to get the data to create Solr documents specific to SearchWorks ... and write the Solr documents to Solr.
 
+Additional details about Solr are documented on Consul, see 
+ - https://consul.stanford.edu/pages/viewpage.action?pageId=156860714
+
 ## Development
 
 ### Installing code locally
