@@ -22,7 +22,7 @@ module SparqlToSwSolr
     BASE_URI = 'http://ld4p-test.stanford.edu/'.freeze
 
     BF_NS = 'http://id.loc.gov/ontologies/bibframe/'.freeze
-    BF_NS_DECL = "PREFIX bf: <#{BF_NS}>".freeze
+    MADSRDF = 'http://www.loc.gov/mads/rdf/v1#'.freeze
 
     DOC_SOURCE = 'Bibframe'.freeze
 
@@ -54,6 +54,18 @@ module SparqlToSwSolr
         add_topic_fields(doc)
         doc
       end
+    end
+
+    def sparql_prefixes
+      @sparql_prefixes ||= begin
+        bf = "PREFIX bf: <#{BF_NS}>"
+        mads = "PREFIX madsrdf: <#{MADSRDF}>"
+        [bf, mads].join("\n")
+      end
+    end
+
+    def sparql_query(query)
+      sparql.query(sparql_prefixes + query)
     end
 
     private
